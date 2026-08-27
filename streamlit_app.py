@@ -13,10 +13,8 @@ LEVELS = [
     "중1", "중2", "중3"
 ]
 
-
 def is_preschool(level):
     return level in {"5세", "6세", "7세"}
-
 
 def subjects_for(level):
     if level in {"초1", "초2"}:
@@ -29,7 +27,6 @@ def subjects_for(level):
         return ["영어", "수학"]
 
     return []
-
 
 if "level" not in st.session_state:
     st.session_state.level = None
@@ -46,11 +43,11 @@ st.html("""
 <style>
 
 :root {
-    --blue: #246FE5;
-    --navy: #17324D;
-    --muted: #6A7C8F;
-    --border: #D7E2EC;
-    --soft: #EEF6FF;
+    --blue:#246FE5;
+    --navy:#17324D;
+    --muted:#6A7C8F;
+    --border:#D7E2EC;
+    --soft:#EEF6FF;
 }
 
 html,
@@ -70,20 +67,20 @@ body,
         linear-gradient(
             180deg,
             #F8FBFF 0%,
-            #FFFFFF 38%
+            #FFFFFF 44%
         );
 
-    color: var(--navy);
+    color:var(--navy);
 }
 
 .block-container {
-    max-width: 760px;
+    max-width:820px;
 
-    padding-top: 0.35rem;
-    padding-bottom: 0.65rem;
+    padding-top:0.75rem;
+    padding-bottom:1rem;
 
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left:1.4rem;
+    padding-right:1.4rem;
 }
 
 #MainMenu,
@@ -91,7 +88,7 @@ footer,
 header,
 [data-testid="stToolbar"],
 [data-testid="stDecoration"] {
-    display: none !important;
+    display:none !important;
 }
 
 
@@ -100,52 +97,52 @@ header,
 ===================================================== */
 
 .hero {
-    text-align: center;
-    margin: 0 0 10px 0;
+    text-align:center;
+    margin:0 0 18px 0;
 }
 
 .badge {
-    display: inline-block;
+    display:inline-block;
 
-    background: #EAF3FF;
-    color: var(--blue);
+    background:#EAF3FF;
+    color:var(--blue);
 
-    padding: 5px 12px;
+    padding:7px 14px;
 
-    border-radius: 999px;
+    border-radius:999px;
 
-    font-size: 12px;
-    font-weight: 900;
+    font-size:13px;
+    font-weight:900;
 
-    margin-bottom: 8px;
+    margin-bottom:12px;
 }
 
 .hero-title {
-    font-size: 30px;
+    font-size:34px;
 
-    line-height: 1.18;
+    line-height:1.22;
 
-    font-weight: 900;
+    font-weight:900;
 
-    letter-spacing: -1px;
+    letter-spacing:-1px;
 
-    color: var(--navy);
+    color:var(--navy);
 
-    margin: 0;
+    margin:0;
 }
 
 .hero-title .accent {
-    color: var(--blue);
+    color:var(--blue);
 }
 
 .hero-sub {
-    margin-top: 8px;
+    margin-top:10px;
 
-    color: var(--muted);
+    color:var(--muted);
 
-    font-size: 13px;
+    font-size:14px;
 
-    line-height: 1.5;
+    line-height:1.6;
 }
 
 
@@ -154,60 +151,60 @@ header,
 ===================================================== */
 
 .features {
-    display: grid;
+    display:grid;
 
     grid-template-columns:
         repeat(3, 1fr);
 
-    gap: 8px;
+    gap:12px;
 
-    margin: 10px 0 9px;
+    margin:16px 0 14px;
 }
 
 .feature {
-    background: #FFFFFF;
+    background:#fff;
 
     border:
         1px solid
         var(--border);
 
-    border-radius: 13px;
+    border-radius:16px;
 
-    padding: 9px 5px 8px;
+    padding:14px 10px 12px;
 
-    text-align: center;
+    text-align:center;
 }
 
 .feature .icon {
-    color: var(--blue);
+    color:var(--blue);
 
-    font-size: 17px;
+    font-size:19px;
 
-    line-height: 1;
+    line-height:1;
 
-    margin-bottom: 3px;
+    margin-bottom:5px;
 
-    font-weight: 900;
+    font-weight:900;
 }
 
 .feature .title {
-    color: var(--navy);
+    color:var(--navy);
 
-    font-size: 12px;
+    font-size:13px;
 
-    line-height: 1.2;
+    line-height:1.25;
 
-    font-weight: 900;
+    font-weight:900;
 }
 
 .feature .sub {
-    color: #8A9AAB;
+    color:#8A9AAB;
 
-    font-size: 10px;
+    font-size:10px;
 
-    line-height: 1.2;
+    line-height:1.25;
 
-    margin-top: 2px;
+    margin-top:3px;
 }
 
 
@@ -216,29 +213,29 @@ header,
 ===================================================== */
 
 .notice {
-    background: var(--soft);
+    background:var(--soft);
 
     border:
         1px solid
         #DBEAFF;
 
-    border-radius: 12px;
+    border-radius:13px;
 
-    padding: 9px 12px;
+    padding:11px 14px;
 
-    color: #50667A;
+    color:#50667A;
 
-    font-size: 11px;
+    font-size:12px;
 
-    line-height: 1.45;
+    line-height:1.5;
 
-    margin: 0 0 10px;
+    margin:0 0 16px;
 
-    text-align: center;
+    text-align:center;
 }
 
 .notice b {
-    color: #1F66C7;
+    color:#1F66C7;
 }
 
 
@@ -247,13 +244,13 @@ header,
 ===================================================== */
 
 .section-label {
-    color: var(--navy);
+    color:var(--navy);
 
-    font-size: 13px;
+    font-size:14px;
 
-    font-weight: 900;
+    font-weight:900;
 
-    margin: 9px 0 5px;
+    margin:14px 0 7px;
 }
 
 
@@ -262,19 +259,17 @@ header,
 ===================================================== */
 
 div[data-testid="stTextInput"] {
-    margin-bottom: 0 !important;
+    margin-bottom:0 !important;
 }
 
 div[data-testid="stTextInput"] input {
 
-    min-height: 42px !important;
-    height: 42px !important;
+    min-height:46px !important;
+    height:46px !important;
 
-    background:
-        #FFFFFF !important;
+    background:#fff !important;
 
-    color:
-        #17324D !important;
+    color:#17324D !important;
 
     -webkit-text-fill-color:
         #17324D !important;
@@ -284,10 +279,10 @@ div[data-testid="stTextInput"] input {
         #CFDBE7 !important;
 
     border-radius:
-        10px !important;
+        11px !important;
 
     font-size:
-        15px !important;
+        16px !important;
 
     padding-top:
         0 !important;
@@ -299,8 +294,7 @@ div[data-testid="stTextInput"] input {
 div[data-testid="stTextInput"]
 input::placeholder {
 
-    color:
-        #9AABBC !important;
+    color:#9AABBC !important;
 
     -webkit-text-fill-color:
         #9AABBC !important;
@@ -312,28 +306,28 @@ input::placeholder {
 ===================================================== */
 
 div.stButton {
-    margin: 0 !important;
+    margin:0 !important;
 }
 
 div.stButton > button {
 
     min-height:
-        40px !important;
+        44px !important;
 
     height:
-        40px !important;
+        44px !important;
 
     border-radius:
-        10px !important;
+        11px !important;
 
     font-size:
-        13px !important;
+        14px !important;
 
     font-weight:
         900 !important;
 
     padding:
-        0.15rem 0.35rem !important;
+        0.2rem 0.45rem !important;
 }
 
 
@@ -342,11 +336,9 @@ div.stButton > button {
 div.stButton
 > button[kind="secondary"] {
 
-    background:
-        #FFFFFF !important;
+    background:#FFFFFF !important;
 
-    color:
-        #17324D !important;
+    color:#17324D !important;
 
     border:
         1px solid
@@ -356,8 +348,7 @@ div.stButton
 div.stButton
 > button[kind="secondary"] * {
 
-    color:
-        #17324D !important;
+    color:#17324D !important;
 
     -webkit-text-fill-color:
         #17324D !important;
@@ -369,11 +360,9 @@ div.stButton
 div.stButton
 > button[kind="primary"] {
 
-    background:
-        #246FE5 !important;
+    background:#246FE5 !important;
 
-    color:
-        #FFFFFF !important;
+    color:#FFFFFF !important;
 
     border:
         1px solid
@@ -383,8 +372,7 @@ div.stButton
 div.stButton
 > button[kind="primary"] * {
 
-    color:
-        #FFFFFF !important;
+    color:#FFFFFF !important;
 
     -webkit-text-fill-color:
         #FFFFFF !important;
@@ -392,38 +380,38 @@ div.stButton
 
 
 /* =====================================================
-   STREAMLIT GAP COMPRESSION
+   STREAMLIT SPACING
 ===================================================== */
 
 [data-testid="stVerticalBlock"] {
     gap:
-        0.28rem !important;
+        0.42rem !important;
 }
 
 [data-testid="stHorizontalBlock"] {
     gap:
-        0.35rem !important;
+        0.55rem !important;
 }
 
 div[data-testid="stAlert"] {
 
     padding:
-        0.45rem 0.7rem !important;
+        0.55rem 0.8rem !important;
 
     margin:
-        0.15rem 0 0 !important;
+        0.2rem 0 0 !important;
 
     border-radius:
-        10px !important;
+        11px !important;
 }
 
 div[data-testid="stAlert"] p {
 
     font-size:
-        11px !important;
+        12px !important;
 
     line-height:
-        1.35 !important;
+        1.4 !important;
 
     margin:
         0 !important;
@@ -435,23 +423,21 @@ div[data-testid="stAlert"] p {
 ===================================================== */
 
 @media (
-    min-width: 700px
+    min-width:700px
 )
 and (
-    max-width: 900px
+    max-width:900px
 ) {
 
     .block-container {
-        max-width: 720px;
-        padding-top: 0.2rem;
+        max-width:790px;
+
+        padding-top:
+            0.55rem;
     }
 
     .hero-title {
-        font-size: 28px;
-    }
-
-    .hero-sub {
-        font-size: 12px;
+        font-size:32px;
     }
 }
 
@@ -461,37 +447,43 @@ and (
 ===================================================== */
 
 @media (
-    max-width: 699px
+    max-width:699px
 ) {
 
     .block-container {
-        padding-top: 0.2rem;
-        padding-left: 0.7rem;
-        padding-right: 0.7rem;
+
+        padding-top:
+            0.4rem;
+
+        padding-left:
+            0.85rem;
+
+        padding-right:
+            0.85rem;
     }
 
     .hero-title {
-        font-size: 25px;
+        font-size:27px;
     }
 
     .hero-sub {
-        font-size: 12px;
+        font-size:12px;
     }
 
     .features {
-        gap: 5px;
+        gap:7px;
     }
 
     .feature {
-        padding: 8px 3px 7px;
+        padding:11px 5px 10px;
     }
 
     .feature .title {
-        font-size: 11px;
+        font-size:12px;
     }
 
     .feature .sub {
-        font-size: 9px;
+        font-size:9px;
     }
 }
 
@@ -511,15 +503,21 @@ st.html("""
     </div>
 
     <div class="hero-title">
+
         우리 아이의 학습상태를
+
         <span class="accent">
             가볍게 확인해보세요
         </span>
+
     </div>
 
     <div class="hero-sub">
+
         짧은 학습점검으로 현재 잘 준비된 부분과
+
         조금 더 연습하면 좋은 부분을 확인합니다.
+
     </div>
 
 </div>
@@ -606,8 +604,12 @@ st.html(
 
 name = st.text_input(
     "학생 이름",
-    placeholder="학생 이름을 입력해주세요",
-    label_visibility="collapsed",
+
+    placeholder=
+        "학생 이름을 입력해주세요",
+
+    label_visibility=
+        "collapsed",
 )
 
 
@@ -621,9 +623,6 @@ st.html(
     '</div>'
 )
 
-
-# 태블릿 세로 화면 기준
-# 6개씩 2줄
 
 for start in range(
     0,
@@ -657,7 +656,9 @@ for start in range(
             key=f"level_{level}",
         ):
 
-            st.session_state.level = level
+            st.session_state.level = (
+                level
+            )
 
             if is_preschool(level):
 
@@ -667,10 +668,13 @@ for start in range(
 
             elif (
                 st.session_state.subject
-                not in subjects_for(level)
+                not in
+                subjects_for(level)
             ):
 
-                st.session_state.subject = None
+                st.session_state.subject = (
+                    None
+                )
 
             st.rerun()
 
@@ -687,21 +691,16 @@ if level:
     if is_preschool(level):
 
         st.html(
-            f"""
-            <div
-                class="notice"
-                style="
-                    margin-top:7px;
-                    margin-bottom:2px;
-                "
-            >
-                {level}
-                ·
-                <b>입학준비도 검사</b>
-                ·
-                한글 + 수 개념 통합
-            </div>
-            """
+
+            f'<div class="notice" '
+            f'style="margin-top:8px; '
+            f'margin-bottom:3px;">'
+
+            f'{level} · '
+            f'<b>입학준비도 검사</b> · '
+            f'한글 + 수 개념 통합'
+
+            f'</div>'
         )
 
     else:
@@ -712,7 +711,9 @@ if level:
             '</div>'
         )
 
-        subjects = subjects_for(level)
+        subjects = subjects_for(
+            level
+        )
 
         cols = st.columns(
             len(subjects)
@@ -746,7 +747,9 @@ if level:
                 ),
             ):
 
-                st.session_state.subject = subject
+                st.session_state.subject = (
+                    subject
+                )
 
                 st.rerun()
 
@@ -754,6 +757,9 @@ if level:
 # =========================================================
 # 시작
 # =========================================================
+
+st.write("")
+
 
 if st.button(
 
