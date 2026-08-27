@@ -1,3 +1,4 @@
+import re
 import streamlit as st
 
 st.set_page_config(
@@ -13,8 +14,10 @@ LEVELS = [
     "중1", "중2", "중3"
 ]
 
+
 def is_preschool(level):
     return level in {"5세", "6세", "7세"}
+
 
 def subjects_for(level):
     if level in {"초1", "초2"}:
@@ -28,15 +31,19 @@ def subjects_for(level):
 
     return []
 
-if "level" not in st.session_state:
-    st.session_state.level = None
 
-if "subject" not in st.session_state:
-    st.session_state.subject = None
+for key, default in {
+    "level": None,
+    "subject": None,
+    "student_name": "",
+    "phone": "",
+}.items():
+    if key not in st.session_state:
+        st.session_state[key] = default
 
 
 # =========================================================
-# STYLE
+# DESIGN
 # =========================================================
 
 st.html("""
@@ -44,9 +51,10 @@ st.html("""
 
 :root {
     --blue:#246FE5;
+    --blue-dark:#175FC9;
     --navy:#17324D;
-    --muted:#6A7C8F;
-    --border:#D7E2EC;
+    --muted:#6B7D90;
+    --border:#D5E1EC;
     --soft:#EEF6FF;
 }
 
@@ -67,20 +75,20 @@ body,
         linear-gradient(
             180deg,
             #F8FBFF 0%,
-            #FFFFFF 44%
+            #FFFFFF 46%
         );
 
     color:var(--navy);
 }
 
 .block-container {
-    max-width:820px;
+    max-width:840px;
 
-    padding-top:0.75rem;
-    padding-bottom:1rem;
+    padding-top:.85rem;
+    padding-bottom:1.4rem;
 
-    padding-left:1.4rem;
-    padding-right:1.4rem;
+    padding-left:1.55rem;
+    padding-right:1.55rem;
 }
 
 #MainMenu,
@@ -98,7 +106,7 @@ header,
 
 .hero {
     text-align:center;
-    margin:0 0 18px 0;
+    margin:0 0 20px;
 }
 
 .badge {
@@ -114,21 +122,20 @@ header,
     font-size:13px;
     font-weight:900;
 
-    margin-bottom:12px;
+    margin-bottom:13px;
 }
 
 .hero-title {
-    font-size:34px;
+    margin:0;
 
+    color:var(--navy);
+
+    font-size:35px;
     line-height:1.22;
 
     font-weight:900;
 
-    letter-spacing:-1px;
-
-    color:var(--navy);
-
-    margin:0;
+    letter-spacing:-1.1px;
 }
 
 .hero-title .accent {
@@ -154,15 +161,15 @@ header,
     display:grid;
 
     grid-template-columns:
-        repeat(3, 1fr);
+        repeat(3,1fr);
 
     gap:12px;
 
-    margin:16px 0 14px;
+    margin:17px 0 15px;
 }
 
 .feature {
-    background:#fff;
+    background:#FFFFFF;
 
     border:
         1px solid
@@ -170,39 +177,33 @@ header,
 
     border-radius:16px;
 
-    padding:14px 10px 12px;
+    padding:15px 10px 13px;
 
     text-align:center;
 }
 
 .feature .icon {
+    font-size:20px;
+
     color:var(--blue);
 
-    font-size:19px;
-
-    line-height:1;
+    font-weight:900;
 
     margin-bottom:5px;
-
-    font-weight:900;
 }
 
 .feature .title {
-    color:var(--navy);
-
     font-size:13px;
 
-    line-height:1.25;
+    color:var(--navy);
 
     font-weight:900;
 }
 
 .feature .sub {
-    color:#8A9AAB;
-
     font-size:10px;
 
-    line-height:1.25;
+    color:#8A9AAB;
 
     margin-top:3px;
 }
@@ -229,9 +230,9 @@ header,
 
     line-height:1.5;
 
-    margin:0 0 16px;
-
     text-align:center;
+
+    margin:0 0 16px;
 }
 
 .notice b {
@@ -240,7 +241,7 @@ header,
 
 
 /* =====================================================
-   LABEL
+   LABELS
 ===================================================== */
 
 .section-label {
@@ -250,12 +251,32 @@ header,
 
     font-weight:900;
 
-    margin:14px 0 7px;
+    margin:15px 0 7px;
+}
+
+.optional {
+    color:#8A9AAB;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    margin-left:4px;
+}
+
+.helper {
+    color:#7B8DA0;
+
+    font-size:11px;
+
+    line-height:1.45;
+
+    margin:-1px 0 6px;
 }
 
 
 /* =====================================================
-   INPUT
+   TEXT INPUT
 ===================================================== */
 
 div[data-testid="stTextInput"] {
@@ -264,10 +285,10 @@ div[data-testid="stTextInput"] {
 
 div[data-testid="stTextInput"] input {
 
-    min-height:46px !important;
-    height:46px !important;
+    min-height:47px !important;
+    height:47px !important;
 
-    background:#fff !important;
+    background:#FFFFFF !important;
 
     color:#17324D !important;
 
@@ -284,11 +305,8 @@ div[data-testid="stTextInput"] input {
     font-size:
         16px !important;
 
-    padding-top:
-        0 !important;
-
-    padding-bottom:
-        0 !important;
+    padding-top:0 !important;
+    padding-bottom:0 !important;
 }
 
 div[data-testid="stTextInput"]
@@ -298,6 +316,18 @@ input::placeholder {
 
     -webkit-text-fill-color:
         #9AABBC !important;
+}
+
+div[data-testid="stTextInput"]
+input:focus {
+
+    border-color:
+        var(--blue) !important;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(36,111,229,.09)
+        !important;
 }
 
 
@@ -311,23 +341,16 @@ div.stButton {
 
 div.stButton > button {
 
-    min-height:
-        44px !important;
+    min-height:45px !important;
+    height:45px !important;
 
-    height:
-        44px !important;
+    border-radius:11px !important;
 
-    border-radius:
-        11px !important;
+    font-size:14px !important;
 
-    font-size:
-        14px !important;
+    font-weight:900 !important;
 
-    font-weight:
-        900 !important;
-
-    padding:
-        0.2rem 0.45rem !important;
+    padding:.2rem .45rem !important;
 }
 
 
@@ -354,19 +377,30 @@ div.stButton
         #17324D !important;
 }
 
+div.stButton
+> button[kind="secondary"]:hover {
+
+    background:#F4F8FC !important;
+
+    border-color:#ABC3DD !important;
+
+    color:#17324D !important;
+}
+
 
 /* 선택 */
 
 div.stButton
 > button[kind="primary"] {
 
-    background:#246FE5 !important;
+    background:
+        var(--blue) !important;
 
     color:#FFFFFF !important;
 
     border:
         1px solid
-        #246FE5 !important;
+        var(--blue) !important;
 }
 
 div.stButton
@@ -378,43 +412,56 @@ div.stButton
         #FFFFFF !important;
 }
 
+div.stButton
+> button[kind="primary"]:hover {
+
+    background:
+        var(--blue-dark) !important;
+
+    border-color:
+        var(--blue-dark) !important;
+}
+
 
 /* =====================================================
    STREAMLIT SPACING
 ===================================================== */
 
 [data-testid="stVerticalBlock"] {
-    gap:
-        0.42rem !important;
+    gap:.46rem !important;
 }
 
 [data-testid="stHorizontalBlock"] {
-    gap:
-        0.55rem !important;
+    gap:.58rem !important;
 }
 
 div[data-testid="stAlert"] {
 
-    padding:
-        0.55rem 0.8rem !important;
+    padding:.55rem .8rem !important;
 
-    margin:
-        0.2rem 0 0 !important;
+    margin:.2rem 0 0 !important;
 
-    border-radius:
-        11px !important;
+    border-radius:11px !important;
 }
 
 div[data-testid="stAlert"] p {
 
-    font-size:
-        12px !important;
+    font-size:12px !important;
 
-    line-height:
-        1.4 !important;
+    line-height:1.4 !important;
 
-    margin:
-        0 !important;
+    margin:0 !important;
+}
+
+
+.start-note {
+    margin:10px 0 4px;
+
+    color:#8A9AAB;
+
+    font-size:10px;
+
+    text-align:center;
 }
 
 
@@ -430,14 +477,13 @@ and (
 ) {
 
     .block-container {
-        max-width:790px;
+        max-width:800px;
 
-        padding-top:
-            0.55rem;
+        padding-top:.65rem;
     }
 
     .hero-title {
-        font-size:32px;
+        font-size:33px;
     }
 }
 
@@ -452,14 +498,10 @@ and (
 
     .block-container {
 
-        padding-top:
-            0.4rem;
+        padding-top:.45rem;
 
-        padding-left:
-            0.85rem;
-
-        padding-right:
-            0.85rem;
+        padding-left:.85rem;
+        padding-right:.85rem;
     }
 
     .hero-title {
@@ -503,21 +545,15 @@ st.html("""
     </div>
 
     <div class="hero-title">
-
         우리 아이의 학습상태를
-
         <span class="accent">
             가볍게 확인해보세요
         </span>
-
     </div>
 
     <div class="hero-sub">
-
         짧은 학습점검으로 현재 잘 준비된 부분과
-
         조금 더 연습하면 좋은 부분을 확인합니다.
-
     </div>
 
 </div>
@@ -605,6 +641,9 @@ st.html(
 name = st.text_input(
     "학생 이름",
 
+    value=
+        st.session_state.student_name,
+
     placeholder=
         "학생 이름을 입력해주세요",
 
@@ -614,7 +653,7 @@ name = st.text_input(
 
 
 # =========================================================
-# 학년
+# 연령 / 학년
 # =========================================================
 
 st.html(
@@ -656,9 +695,7 @@ for start in range(
             key=f"level_{level}",
         ):
 
-            st.session_state.level = (
-                level
-            )
+            st.session_state.level = level
 
             if is_preschool(level):
 
@@ -672,15 +709,13 @@ for start in range(
                 subjects_for(level)
             ):
 
-                st.session_state.subject = (
-                    None
-                )
+                st.session_state.subject = None
 
             st.rerun()
 
 
 # =========================================================
-# 과목
+# 점검 과목
 # =========================================================
 
 level = st.session_state.level
@@ -691,10 +726,9 @@ if level:
     if is_preschool(level):
 
         st.html(
-
             f'<div class="notice" '
-            f'style="margin-top:8px; '
-            f'margin-bottom:3px;">'
+            f'style="margin-top:8px;'
+            f'margin-bottom:4px;">'
 
             f'{level} · '
             f'<b>입학준비도 검사</b> · '
@@ -747,19 +781,54 @@ if level:
                 ),
             ):
 
-                st.session_state.subject = (
-                    subject
-                )
+                st.session_state.subject = subject
 
                 st.rerun()
 
 
 # =========================================================
-# 시작
+# 연락처 - 선택사항
 # =========================================================
 
-st.write("")
+st.html(
+    '<div class="section-label">'
+    '점검 결과 받아보기 '
+    '<span class="optional">'
+    '선택사항'
+    '</span>'
+    '</div>'
 
+    '<div class="helper">'
+    '점검 결과를 휴대폰으로 받아보시려면 '
+    '연락처를 남겨주세요.'
+    '</div>'
+)
+
+phone = st.text_input(
+    "휴대폰 번호",
+
+    value=
+        st.session_state.phone,
+
+    placeholder=
+        "010-0000-0000",
+
+    label_visibility=
+        "collapsed",
+)
+
+
+st.html(
+    '<div class="start-note">'
+    '연락처를 입력하지 않아도 '
+    '학습점검을 진행할 수 있습니다.'
+    '</div>'
+)
+
+
+# =========================================================
+# 시작 버튼
+# =========================================================
 
 if st.button(
 
@@ -792,8 +861,29 @@ if st.button(
             "점검 과목을 선택해주세요."
         )
 
+    elif (
+        phone.strip()
+        and
+        not re.fullmatch(
+            r"01[016789]-?\d{3,4}-?\d{4}",
+            phone.strip(),
+        )
+    ):
+
+        st.warning(
+            "휴대폰 번호 형식을 확인해주세요."
+        )
+
     else:
 
+        st.session_state.student_name = (
+            name.strip()
+        )
+
+        st.session_state.phone = (
+            phone.strip()
+        )
+
         st.success(
-            "현재는 첫 화면 디자인 확인 단계입니다."
+            "현재는 메인페이지 디자인 확인 단계입니다."
         )
