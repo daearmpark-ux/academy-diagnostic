@@ -29,7 +29,7 @@ LEVELS = [
 
 
 # UI 검토용 임시 문항
-# 실제 문항은 2차에서 전부 교체
+# 실제 문항은 다음 단계에서 교체
 PLACEHOLDER_QUESTIONS = [
     {
         "text": "다음 중 알맞은 답을 골라주세요.",
@@ -38,6 +38,7 @@ PLACEHOLDER_QUESTIONS = [
             "② 두 번째 보기",
             "③ 세 번째 보기",
             "④ 네 번째 보기",
+            "⑤ 다섯 번째 보기",
         ],
         "area": "기초 개념",
         "recommended_sec": 30,
@@ -49,6 +50,7 @@ PLACEHOLDER_QUESTIONS = [
             "② 선택지 B",
             "③ 선택지 C",
             "④ 선택지 D",
+            "⑤ 선택지 E",
         ],
         "area": "개념 활용",
         "recommended_sec": 35,
@@ -60,6 +62,7 @@ PLACEHOLDER_QUESTIONS = [
             "② 보기 2",
             "③ 보기 3",
             "④ 보기 4",
+            "⑤ 보기 5",
         ],
         "area": "문제 해결",
         "recommended_sec": 40,
@@ -149,37 +152,24 @@ def reset_exam_state():
 
 
 # =========================================================
-# DESIGN SYSTEM
+# DESIGN
 # =========================================================
 
 st.html("""
 <style>
 
 :root {
-
     --blue:#246FE5;
     --blue-dark:#175FC9;
-
     --navy:#17324D;
-
     --muted:#6B7D90;
-
     --border:#D5E1EC;
-
     --soft:#EEF6FF;
-
-    --green:#2A9D6F;
-
-    --amber:#E79B2F;
-
-    --red:#D85858;
 }
-
 
 html,
 body,
 [class*="css"] {
-
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -189,9 +179,7 @@ body,
         sans-serif;
 }
 
-
 .stApp {
-
     background:
         linear-gradient(
             180deg,
@@ -202,27 +190,21 @@ body,
     color:var(--navy);
 }
 
-
 .block-container {
-
     max-width:840px;
 
     padding-top:.85rem;
-
-    padding-bottom:2.4rem;
+    padding-bottom:2.8rem;
 
     padding-left:1.55rem;
-
     padding-right:1.55rem;
 }
-
 
 #MainMenu,
 footer,
 header,
 [data-testid="stToolbar"],
 [data-testid="stDecoration"] {
-
     display:none !important;
 }
 
@@ -231,45 +213,28 @@ header,
    COMMON
 ===================================================== */
 
-
 .section-label {
-
     color:var(--navy);
-
     font-size:14px;
-
     font-weight:900;
-
     margin:15px 0 7px;
 }
 
-
 .optional {
-
     color:#8A9AAB;
-
     font-size:11px;
-
     font-weight:700;
-
     margin-left:4px;
 }
 
-
 .helper {
-
     color:#7B8DA0;
-
     font-size:11px;
-
     line-height:1.45;
-
     margin:-1px 0 6px;
 }
 
-
 .notice {
-
     background:var(--soft);
 
     border:
@@ -283,7 +248,6 @@ header,
     color:#50667A;
 
     font-size:12px;
-
     line-height:1.5;
 
     text-align:center;
@@ -291,9 +255,7 @@ header,
     margin:0 0 16px;
 }
 
-
 .notice b {
-
     color:#1F66C7;
 }
 
@@ -302,25 +264,19 @@ header,
    TEXT INPUT
 ===================================================== */
 
-
 div[data-testid="stTextInput"] {
-
     margin-bottom:0 !important;
 }
-
 
 div[data-testid="stTextInput"] input {
 
     min-height:47px !important;
-
     height:47px !important;
 
     background:#FFFFFF !important;
 
     color:#17324D !important;
-
-    -webkit-text-fill-color:
-        #17324D !important;
+    -webkit-text-fill-color:#17324D !important;
 
     border:
         1px solid
@@ -330,33 +286,11 @@ div[data-testid="stTextInput"] input {
         11px !important;
 
     font-size:16px !important;
-
-    padding-top:0 !important;
-
-    padding-bottom:0 !important;
 }
 
-
-div[data-testid="stTextInput"]
-input::placeholder {
-
+div[data-testid="stTextInput"] input::placeholder {
     color:#9AABBC !important;
-
-    -webkit-text-fill-color:
-        #9AABBC !important;
-}
-
-
-div[data-testid="stTextInput"]
-input:focus {
-
-    border-color:
-        var(--blue) !important;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(36,111,229,.09)
-        !important;
+    -webkit-text-fill-color:#9AABBC !important;
 }
 
 
@@ -364,18 +298,13 @@ input:focus {
    BUTTONS
 ===================================================== */
 
-
 div.stButton {
-
     margin:0 !important;
 }
-
 
 div.stButton > button {
 
     min-height:45px !important;
-
-    height:45px !important;
 
     border-radius:
         11px !important;
@@ -387,196 +316,137 @@ div.stButton > button {
         900 !important;
 
     padding:
-        .2rem .45rem !important;
+        .45rem .6rem !important;
 }
 
 
-/* 미선택 버튼 */
+/* 미선택 */
 
 div.stButton
 > button[kind="secondary"] {
 
-    background:
-        #FFFFFF !important;
+    background:#FFFFFF !important;
 
-    color:
-        #17324D !important;
+    color:#17324D !important;
 
     border:
         1px solid
         #CFDBE7 !important;
 }
 
-
 div.stButton
 > button[kind="secondary"] * {
 
-    color:
-        #17324D !important;
+    color:#17324D !important;
 
     -webkit-text-fill-color:
         #17324D !important;
 }
 
 
-div.stButton
-> button[kind="secondary"]:hover {
-
-    background:
-        #F4F8FC !important;
-
-    border-color:
-        #ABC3DD !important;
-
-    color:
-        #17324D !important;
-}
-
-
-/* 선택 버튼 */
+/* 선택 */
 
 div.stButton
 > button[kind="primary"] {
 
-    background:
-        var(--blue) !important;
+    background:#246FE5 !important;
 
-    color:
-        #FFFFFF !important;
+    color:#FFFFFF !important;
 
     border:
         1px solid
-        var(--blue) !important;
+        #246FE5 !important;
 }
-
 
 div.stButton
 > button[kind="primary"] * {
 
-    color:
-        #FFFFFF !important;
+    color:#FFFFFF !important;
 
     -webkit-text-fill-color:
         #FFFFFF !important;
 }
 
 
-div.stButton
-> button[kind="primary"]:hover {
+/* 보기 길이에 따라 높이 증가 */
 
-    background:
-        var(--blue-dark) !important;
+div[data-testid="stButton"]
+button {
 
-    border-color:
-        var(--blue-dark) !important;
+    white-space:
+        normal !important;
+
+    height:
+        auto !important;
 }
 
 
 /* =====================================================
-   STREAMLIT SPACING
+   SPACING
 ===================================================== */
 
-
 [data-testid="stVerticalBlock"] {
-
     gap:.46rem !important;
 }
 
-
 [data-testid="stHorizontalBlock"] {
-
     gap:.58rem !important;
 }
 
 
 /* =====================================================
-   HOME HERO
+   HOME
 ===================================================== */
 
-
 .hero {
-
     text-align:center;
-
     margin:0 0 20px;
 }
-
 
 .badge {
 
     display:inline-block;
 
-    background:
-        #EAF3FF;
+    background:#EAF3FF;
+    color:var(--blue);
 
-    color:
-        var(--blue);
+    padding:7px 14px;
 
-    padding:
-        7px 14px;
+    border-radius:999px;
 
-    border-radius:
-        999px;
+    font-size:13px;
+    font-weight:900;
 
-    font-size:
-        13px;
-
-    font-weight:
-        900;
-
-    margin-bottom:
-        13px;
+    margin-bottom:13px;
 }
-
 
 .hero-title {
 
     margin:0;
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        35px;
+    font-size:35px;
+    line-height:1.22;
 
-    line-height:
-        1.22;
+    font-weight:900;
 
-    font-weight:
-        900;
-
-    letter-spacing:
-        -1.1px;
+    letter-spacing:-1.1px;
 }
-
 
 .hero-title .accent {
-
-    color:
-        var(--blue);
+    color:var(--blue);
 }
-
 
 .hero-sub {
 
-    margin-top:
-        10px;
+    margin-top:10px;
 
-    color:
-        var(--muted);
+    color:var(--muted);
 
-    font-size:
-        14px;
-
-    line-height:
-        1.6;
+    font-size:14px;
+    line-height:1.6;
 }
-
-
-/* =====================================================
-   HOME FEATURE CARDS
-===================================================== */
-
 
 .features {
 
@@ -585,155 +455,106 @@ div.stButton
     grid-template-columns:
         repeat(3,1fr);
 
-    gap:
-        12px;
+    gap:12px;
 
-    margin:
-        17px 0 15px;
+    margin:17px 0 15px;
 }
-
 
 .feature {
 
-    background:
-        #FFFFFF;
+    background:#FFFFFF;
 
     border:
         1px solid
         var(--border);
 
-    border-radius:
-        16px;
+    border-radius:16px;
 
-    padding:
-        15px 10px 13px;
+    padding:15px 10px 13px;
 
-    text-align:
-        center;
+    text-align:center;
 }
-
 
 .feature .icon {
 
-    font-size:
-        20px;
+    font-size:20px;
+    color:var(--blue);
 
-    color:
-        var(--blue);
+    font-weight:900;
 
-    font-weight:
-        900;
-
-    margin-bottom:
-        5px;
+    margin-bottom:5px;
 }
-
 
 .feature .title {
 
-    font-size:
-        13px;
+    font-size:13px;
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-weight:
-        900;
+    font-weight:900;
 }
-
 
 .feature .sub {
 
-    font-size:
-        10px;
+    font-size:10px;
 
-    color:
-        #8A9AAB;
+    color:#8A9AAB;
 
-    margin-top:
-        3px;
+    margin-top:3px;
 }
-
 
 .start-note {
 
-    margin:
-        10px 0 4px;
+    margin:10px 0 4px;
 
-    color:
-        #8A9AAB;
+    color:#8A9AAB;
 
-    font-size:
-        10px;
+    font-size:10px;
 
-    text-align:
-        center;
+    text-align:center;
 }
 
 
 /* =====================================================
-   TEST PAGE
+   TEST
 ===================================================== */
 
-
 .exam-head {
-
-    margin:
-        0 0 16px;
+    margin:0 0 18px;
 }
-
 
 .exam-kicker {
 
-    color:
-        var(--blue);
+    color:var(--blue);
 
-    font-size:
-        12px;
+    font-size:12px;
+    font-weight:900;
 
-    font-weight:
-        900;
-
-    margin-bottom:
-        4px;
+    margin-bottom:4px;
 }
-
 
 .exam-title {
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        28px;
+    font-size:28px;
+    line-height:1.25;
 
-    line-height:
-        1.25;
+    font-weight:900;
 
-    font-weight:
-        900;
-
-    margin:
-        0 0 4px;
+    margin:0 0 4px;
 }
-
 
 .exam-meta {
 
-    color:
-        var(--muted);
+    color:var(--muted);
 
-    font-size:
-        12px;
+    font-size:12px;
 }
-
 
 .progress-wrap {
-
-    margin:
-        12px 0 18px;
+    margin:12px 0 22px;
 }
-
 
 .progress-top {
 
@@ -742,356 +563,218 @@ div.stButton
     justify-content:
         space-between;
 
-    align-items:center;
+    color:#66788A;
 
-    color:
-        #66788A;
+    font-size:11px;
 
-    font-size:
-        11px;
-
-    margin-bottom:
-        6px;
+    margin-bottom:6px;
 }
-
 
 .progress-track {
 
-    height:
-        8px;
+    height:8px;
 
-    background:
-        #E5EDF6;
+    background:#E5EDF6;
 
-    border-radius:
-        999px;
+    border-radius:999px;
 
-    overflow:
-        hidden;
+    overflow:hidden;
 }
-
 
 .progress-fill {
 
-    height:
-        100%;
+    height:100%;
 
-    background:
-        var(--blue);
+    background:var(--blue);
 
-    border-radius:
-        999px;
+    border-radius:999px;
 }
-
 
 .question-card {
 
-    background:
-        #FFFFFF;
+    background:#FFFFFF;
 
     border:
         1px solid
         var(--border);
 
-    border-radius:
-        18px;
+    border-radius:18px;
 
-    padding:
-        26px 22px;
+    padding:30px 26px;
 
-    margin:
-        0 0 14px;
+    margin:0 0 20px;
 
     box-shadow:
         0 6px 20px
         rgba(43,76,110,.04);
 }
 
-
 .question-no {
 
-    color:
-        var(--blue);
+    color:var(--blue);
 
-    font-size:
-        11px;
+    font-size:11px;
+    font-weight:900;
 
-    font-weight:
-        900;
-
-    margin-bottom:
-        10px;
+    margin-bottom:10px;
 }
-
 
 .question-area {
 
-    color:
-        #7A8DA1;
+    color:#7A8DA1;
 
-    font-size:
-        11px;
+    font-size:11px;
 
-    margin-bottom:
-        7px;
+    margin-bottom:7px;
 }
-
 
 .question-text {
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        20px;
+    font-size:21px;
+    line-height:1.7;
 
-    line-height:
-        1.65;
+    font-weight:900;
 
-    font-weight:
-        900;
-
-    word-break:
-        keep-all;
+    word-break:keep-all;
 }
-
 
 .time-hint {
 
-    color:
-        #8B9BAD;
+    color:#8B9BAD;
 
-    font-size:
-        10px;
+    font-size:10px;
 
-    text-align:
-        right;
+    text-align:right;
 
-    margin-top:
-        14px;
-}
-
-
-/* 테스트 선택지 */
-
-div[data-testid="stRadio"] label {
-
-    background:
-        #FFFFFF !important;
-
-    border:
-        1px solid
-        #D7E2EC !important;
-
-    border-radius:
-        12px !important;
-
-    padding:
-        12px 13px !important;
-
-    margin-bottom:
-        7px !important;
-}
-
-
-div[data-testid="stRadio"] label p {
-
-    color:
-        #17324D !important;
-
-    -webkit-text-fill-color:
-        #17324D !important;
-
-    font-size:
-        14px !important;
+    margin-top:16px;
 }
 
 
 /* =====================================================
-   RESULT PAGE
+   RESULT
 ===================================================== */
 
-
 .result-hero {
-
-    text-align:
-        center;
-
-    margin:
-        4px 0 20px;
+    text-align:center;
+    margin:4px 0 20px;
 }
-
 
 .result-mark {
 
-    width:
-        54px;
+    width:54px;
+    height:54px;
 
-    height:
-        54px;
+    border-radius:50%;
 
-    border-radius:
-        50%;
+    background:#EAF3FF;
 
-    background:
-        #EAF3FF;
+    color:var(--blue);
 
-    color:
-        var(--blue);
+    display:flex;
 
-    display:
-        flex;
+    align-items:center;
+    justify-content:center;
 
-    align-items:
-        center;
+    margin:0 auto 10px;
 
-    justify-content:
-        center;
-
-    margin:
-        0 auto 10px;
-
-    font-size:
-        25px;
-
-    font-weight:
-        900;
+    font-size:25px;
+    font-weight:900;
 }
-
 
 .result-title {
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        27px;
+    font-size:27px;
 
-    line-height:
-        1.3;
-
-    font-weight:
-        900;
+    font-weight:900;
 }
-
 
 .result-sub {
 
-    color:
-        var(--muted);
+    color:var(--muted);
 
-    font-size:
-        12px;
+    font-size:12px;
 
-    margin-top:
-        5px;
+    margin-top:5px;
 }
-
 
 .metrics {
 
-    display:
-        grid;
+    display:grid;
 
     grid-template-columns:
         repeat(3,1fr);
 
-    gap:
-        10px;
+    gap:10px;
 
-    margin:
-        0 0 14px;
+    margin:0 0 14px;
 }
-
 
 .metric {
 
-    background:
-        #FFFFFF;
+    background:#FFFFFF;
 
     border:
         1px solid
         var(--border);
 
-    border-radius:
-        15px;
+    border-radius:15px;
 
-    padding:
-        14px 8px;
+    padding:14px 8px;
 
-    text-align:
-        center;
+    text-align:center;
 }
-
 
 .metric .label {
 
-    color:
-        #7B8DA0;
+    color:#7B8DA0;
 
-    font-size:
-        10px;
+    font-size:10px;
 
-    margin-bottom:
-        4px;
+    margin-bottom:4px;
 }
-
 
 .metric .value {
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        20px;
+    font-size:20px;
 
-    font-weight:
-        900;
+    font-weight:900;
 }
-
 
 .result-card {
 
-    background:
-        #FFFFFF;
+    background:#FFFFFF;
 
     border:
         1px solid
         var(--border);
 
-    border-radius:
-        17px;
+    border-radius:17px;
 
-    padding:
-        18px;
+    padding:18px;
 
-    margin-bottom:
-        12px;
+    margin-bottom:12px;
 }
-
 
 .card-title {
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        15px;
+    font-size:15px;
 
-    font-weight:
-        900;
+    font-weight:900;
 
-    margin-bottom:
-        14px;
+    margin-bottom:14px;
 }
-
 
 .bar-row {
-
-    margin-bottom:
-        14px;
+    margin-bottom:14px;
 }
-
 
 .bar-head {
 
@@ -1100,53 +783,32 @@ div[data-testid="stRadio"] label p {
     justify-content:
         space-between;
 
-    gap:
-        8px;
+    color:#4D6277;
 
-    color:
-        #4D6277;
+    font-size:12px;
 
-    font-size:
-        12px;
-
-    margin-bottom:
-        5px;
+    margin-bottom:5px;
 }
-
 
 .bar-track {
 
-    height:
-        8px;
+    height:8px;
 
-    background:
-        #E8EEF5;
+    background:#E8EEF5;
 
-    border-radius:
-        999px;
+    border-radius:999px;
 
-    overflow:
-        hidden;
+    overflow:hidden;
 }
-
 
 .bar-fill {
 
-    height:
-        100%;
+    height:100%;
 
-    background:
-        var(--blue);
+    background:var(--blue);
 
-    border-radius:
-        999px;
+    border-radius:999px;
 }
-
-
-/* =====================================================
-   TIME RESULT
-===================================================== */
-
 
 .time-grid {
 
@@ -1155,161 +817,108 @@ div[data-testid="stRadio"] label p {
     grid-template-columns:
         repeat(2,1fr);
 
-    gap:
-        8px;
+    gap:8px;
 }
-
 
 .time-box {
 
-    background:
-        #F8FBFE;
+    background:#F8FBFE;
 
     border:
         1px solid
         #E4ECF4;
 
-    border-radius:
-        12px;
+    border-radius:12px;
 
-    padding:
-        11px 12px;
+    padding:11px 12px;
 }
-
 
 .time-box .t-title {
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        12px;
+    font-size:12px;
 
-    font-weight:
-        900;
-
-    margin-bottom:
-        3px;
+    font-weight:900;
 }
-
 
 .time-box .t-sub {
 
-    color:
-        #72859A;
+    color:#72859A;
 
-    font-size:
-        10px;
+    font-size:10px;
 }
-
-
-/* =====================================================
-   RECOMMEND RESULT
-===================================================== */
-
 
 .recommend {
 
-    background:
-        #F8FBFE;
+    background:#F8FBFE;
 
     border:
         1px solid
         #E4ECF4;
 
-    border-radius:
-        12px;
+    border-radius:12px;
 
-    padding:
-        11px 12px;
+    padding:11px 12px;
 
-    margin-bottom:
-        7px;
+    margin-bottom:7px;
 }
-
 
 .recommend .r-label {
 
-    color:
-        var(--blue);
+    color:var(--blue);
 
-    font-size:
-        10px;
+    font-size:10px;
 
-    font-weight:
-        900;
-
-    margin-bottom:
-        3px;
+    font-weight:900;
 }
-
 
 .recommend .r-text {
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        13px;
+    font-size:13px;
 
-    font-weight:
-        900;
+    font-weight:900;
 }
 
 
 /* =====================================================
-   RECORD PAGE
+   RECORDS
 ===================================================== */
-
 
 .records-title {
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        24px;
+    font-size:24px;
 
-    font-weight:
-        900;
+    font-weight:900;
 }
-
 
 .records-sub {
 
-    color:
-        var(--muted);
+    color:var(--muted);
 
-    font-size:
-        11px;
+    font-size:11px;
 
-    margin-top:
-        3px;
-
-    margin-bottom:
-        14px;
+    margin-bottom:14px;
 }
-
 
 .record-card {
 
-    background:
-        #FFFFFF;
+    background:#FFFFFF;
 
     border:
         1px solid
         var(--border);
 
-    border-radius:
-        14px;
+    border-radius:14px;
 
-    padding:
-        13px 14px;
+    padding:13px 14px;
 
-    margin-bottom:
-        8px;
+    margin-bottom:8px;
 }
-
 
 .record-top {
 
@@ -1317,74 +926,46 @@ div[data-testid="stRadio"] label p {
 
     justify-content:
         space-between;
-
-    gap:
-        10px;
-
-    align-items:
-        flex-start;
 }
-
 
 .record-name {
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        14px;
+    font-size:14px;
 
-    font-weight:
-        900;
+    font-weight:900;
 }
-
 
 .record-meta {
 
-    color:
-        #72859A;
+    color:#72859A;
 
-    font-size:
-        10px;
-
-    margin-top:
-        3px;
+    font-size:10px;
 }
-
 
 .record-phone {
 
-    color:
-        var(--blue);
+    color:var(--blue);
 
-    font-size:
-        11px;
+    font-size:11px;
 
-    font-weight:
-        900;
-
-    text-align:
-        right;
+    font-weight:900;
 }
-
 
 .record-score {
 
-    color:
-        var(--navy);
+    color:var(--navy);
 
-    font-size:
-        12px;
+    font-size:12px;
 
-    margin-top:
-        8px;
+    margin-top:8px;
 }
 
 
 /* =====================================================
-   TABLET
+   RESPONSIVE
 ===================================================== */
-
 
 @media (
     min-width:700px
@@ -1394,33 +975,13 @@ and (
 ) {
 
     .block-container {
-
-        max-width:
-            800px;
-
-        padding-top:
-            .65rem;
+        max-width:800px;
     }
-
-
-    .hero-title {
-
-        font-size:
-            33px;
-    }
-
 
     .question-text {
-
-        font-size:
-            21px;
+        font-size:21px;
     }
 }
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
 
 
 @media (
@@ -1429,101 +990,20 @@ and (
 
     .block-container {
 
-        padding-top:
-            .45rem;
-
-        padding-left:
-            .85rem;
-
-        padding-right:
-            .85rem;
-
-        padding-bottom:
-            2rem;
+        padding-left:.85rem;
+        padding-right:.85rem;
     }
-
 
     .hero-title {
-
-        font-size:
-            27px;
+        font-size:27px;
     }
-
-
-    .hero-sub {
-
-        font-size:
-            12px;
-    }
-
-
-    .features {
-
-        gap:
-            7px;
-    }
-
-
-    .feature {
-
-        padding:
-            11px 5px 10px;
-    }
-
-
-    .feature .title {
-
-        font-size:
-            12px;
-    }
-
-
-    .feature .sub {
-
-        font-size:
-            9px;
-    }
-
-
-    .exam-title {
-
-        font-size:
-            24px;
-    }
-
-
-    .question-card {
-
-        padding:
-            20px 17px;
-    }
-
 
     .question-text {
-
-        font-size:
-            18px;
+        font-size:18px;
     }
-
-
-    .metrics {
-
-        gap:
-            7px;
-    }
-
-
-    .metric .value {
-
-        font-size:
-            17px;
-    }
-
 
     .time-grid {
-
-        grid-template-columns:
-            1fr;
+        grid-template-columns:1fr;
     }
 }
 
@@ -1532,7 +1012,7 @@ and (
 
 
 # =========================================================
-# SHARED FUNCTIONS
+# SHARED
 # =========================================================
 
 def current_question():
@@ -1576,28 +1056,26 @@ def build_demo_result():
     if total_seconds <= 0:
         total_seconds = 462
 
-
     recommended_total = 410
-
 
     areas = {
 
         "기초 개념": {
-            "accuracy": 90,
-            "actual": 142,
-            "recommended": 120,
+            "accuracy":90,
+            "actual":142,
+            "recommended":120,
         },
 
         "개념 활용": {
-            "accuracy": 75,
-            "actual": 168,
-            "recommended": 150,
+            "accuracy":75,
+            "actual":168,
+            "recommended":150,
         },
 
         "문제 해결": {
-            "accuracy": 65,
-            "actual": 152,
-            "recommended": 140,
+            "accuracy":65,
+            "actual":152,
+            "recommended":140,
         },
     }
 
@@ -1610,14 +1088,13 @@ def build_demo_result():
 
 
 # =========================================================
-# HOME PAGE
+# HOME
 # =========================================================
 
 def home_page():
 
-    # 오른쪽 기록 메뉴
     menu_col1, menu_col2 = st.columns(
-        [8, 1]
+        [8,1]
     )
 
     with menu_col2:
@@ -1629,7 +1106,6 @@ def home_page():
         ):
 
             st.session_state.page = "records"
-
             st.rerun()
 
 
@@ -1663,53 +1139,21 @@ def home_page():
     <div class="features">
 
         <div class="feature">
-
-            <div class="icon">
-                ✓
-            </div>
-
-            <div class="title">
-                간편한 점검
-            </div>
-
-            <div class="sub">
-                약 5~10분
-            </div>
-
+            <div class="icon">✓</div>
+            <div class="title">간편한 점검</div>
+            <div class="sub">약 5~10분</div>
         </div>
 
-
         <div class="feature">
-
-            <div class="icon">
-                ▥
-            </div>
-
-            <div class="title">
-                영역별 확인
-            </div>
-
-            <div class="sub">
-                정확도 · 풀이시간
-            </div>
-
+            <div class="icon">▥</div>
+            <div class="title">영역별 확인</div>
+            <div class="sub">정확도 · 풀이시간</div>
         </div>
 
-
         <div class="feature">
-
-            <div class="icon">
-                ↗
-            </div>
-
-            <div class="title">
-                학습 추천
-            </div>
-
-            <div class="sub">
-                결과 즉시 확인
-            </div>
-
+            <div class="icon">↗</div>
+            <div class="title">학습 추천</div>
+            <div class="sub">결과 즉시 확인</div>
         </div>
 
     </div>
@@ -1729,16 +1173,11 @@ def home_page():
     """)
 
 
-    # -----------------------------------------------------
-    # 학생 이름
-    # -----------------------------------------------------
-
     st.html(
         '<div class="section-label">'
         '학생 이름'
         '</div>'
     )
-
 
     name = st.text_input(
 
@@ -1757,10 +1196,6 @@ def home_page():
             "home_name",
     )
 
-
-    # -----------------------------------------------------
-    # 연령 / 학년
-    # -----------------------------------------------------
 
     st.html(
         '<div class="section-label">'
@@ -1803,17 +1238,13 @@ def home_page():
                     f"level_{level}",
             ):
 
-                st.session_state.level = (
-                    level
-                )
-
+                st.session_state.level = level
 
                 if is_preschool(level):
 
                     st.session_state.subject = (
                         "한글 · 수 개념"
                     )
-
 
                 elif (
                     st.session_state.subject
@@ -1823,23 +1254,17 @@ def home_page():
 
                     st.session_state.subject = None
 
-
                 st.rerun()
 
 
     level = st.session_state.level
 
 
-    # -----------------------------------------------------
-    # 과목
-    # -----------------------------------------------------
-
     if level:
 
         if is_preschool(level):
 
             st.html(
-
                 f'<div class="notice" '
                 f'style="margin-top:8px;'
                 f'margin-bottom:4px;">'
@@ -1851,7 +1276,6 @@ def home_page():
                 f'</div>'
             )
 
-
         else:
 
             st.html(
@@ -1860,16 +1284,13 @@ def home_page():
                 '</div>'
             )
 
-
             subjects = subjects_for(
                 level
             )
 
-
             cols = st.columns(
                 len(subjects)
             )
-
 
             for index, subject in enumerate(
                 subjects
@@ -1880,7 +1301,6 @@ def home_page():
                     ==
                     subject
                 )
-
 
                 if cols[index].button(
 
@@ -1907,10 +1327,6 @@ def home_page():
 
                     st.rerun()
 
-
-    # -----------------------------------------------------
-    # 연락처
-    # -----------------------------------------------------
 
     st.html(
         '<div class="section-label">'
@@ -1953,10 +1369,6 @@ def home_page():
     )
 
 
-    # -----------------------------------------------------
-    # 시작
-    # -----------------------------------------------------
-
     if st.button(
 
         "학습점검 시작하기",
@@ -1975,13 +1387,11 @@ def home_page():
                 "학생 이름을 입력해주세요."
             )
 
-
         elif not level:
 
             st.warning(
                 "연령 또는 학년을 선택해주세요."
             )
-
 
         elif (
             not is_preschool(level)
@@ -1992,7 +1402,6 @@ def home_page():
             st.warning(
                 "점검 과목을 선택해주세요."
             )
-
 
         elif (
             phone.strip()
@@ -2007,7 +1416,6 @@ def home_page():
                 "휴대폰 번호 형식을 확인해주세요."
             )
 
-
         else:
 
             st.session_state.student_name = (
@@ -2019,9 +1427,7 @@ def home_page():
             )
 
             st.session_state.question_no = 1
-
             st.session_state.answers = {}
-
             st.session_state.times = {}
 
             st.session_state.question_started_at = (
@@ -2034,7 +1440,7 @@ def home_page():
 
 
 # =========================================================
-# TEST PAGE
+# TEST
 # =========================================================
 
 def test_page():
@@ -2051,7 +1457,6 @@ def test_page():
 
 
     st.html(
-
         f"""
         <div class="exam-head">
 
@@ -2064,13 +1469,9 @@ def test_page():
             </div>
 
             <div class="exam-meta">
-
                 {st.session_state.level}
-
                 ·
-
                 {st.session_state.subject}
-
             </div>
 
         </div>
@@ -2079,17 +1480,9 @@ def test_page():
         <div class="progress-wrap">
 
             <div class="progress-top">
-
-                <span>
-                    {q} / {total_questions}
-                </span>
-
-                <span>
-                    {progress}%
-                </span>
-
+                <span>{q} / {total_questions}</span>
+                <span>{progress}%</span>
             </div>
-
 
             <div class="progress-track">
 
@@ -2127,50 +1520,175 @@ def test_page():
     )
 
 
-    previous_answer = (
+    choices = question["choices"]
+
+    previous = (
         st.session_state.answers.get(q)
     )
 
 
-    if (
-        previous_answer
-        in question["choices"]
-    ):
+    # =====================================================
+    # 중앙 답안 영역
+    #
+    # 전체 페이지
+    # [여백] [답안 영역 약 76%] [여백]
+    #
+    # 내부:
+    # 1 | 2
+    # 3 | 4
+    #   5
+    # =====================================================
 
-        radio_index = (
-            question["choices"].index(
-                previous_answer
+    outer_left, answer_area, outer_right = (
+        st.columns(
+            [1.2, 7.6, 1.2]
+        )
+    )
+
+
+    with answer_area:
+
+        # 1 / 2
+
+        row1 = st.columns(2)
+
+
+        if row1[0].button(
+
+            choices[0],
+
+            use_container_width=True,
+
+            type=(
+                "primary"
+                if previous == choices[0]
+                else "secondary"
+            ),
+
+            key=
+                f"ans_{q}_1",
+        ):
+
+            st.session_state.answers[q] = (
+                choices[0]
+            )
+
+            st.rerun()
+
+
+        if row1[1].button(
+
+            choices[1],
+
+            use_container_width=True,
+
+            type=(
+                "primary"
+                if previous == choices[1]
+                else "secondary"
+            ),
+
+            key=
+                f"ans_{q}_2",
+        ):
+
+            st.session_state.answers[q] = (
+                choices[1]
+            )
+
+            st.rerun()
+
+
+        # 3 / 4
+
+        row2 = st.columns(2)
+
+
+        if row2[0].button(
+
+            choices[2],
+
+            use_container_width=True,
+
+            type=(
+                "primary"
+                if previous == choices[2]
+                else "secondary"
+            ),
+
+            key=
+                f"ans_{q}_3",
+        ):
+
+            st.session_state.answers[q] = (
+                choices[2]
+            )
+
+            st.rerun()
+
+
+        if row2[1].button(
+
+            choices[3],
+
+            use_container_width=True,
+
+            type=(
+                "primary"
+                if previous == choices[3]
+                else "secondary"
+            ),
+
+            key=
+                f"ans_{q}_4",
+        ):
+
+            st.session_state.answers[q] = (
+                choices[3]
+            )
+
+            st.rerun()
+
+
+        # 5번 가운데
+
+        five_left, five_mid, five_right = (
+            st.columns(
+                [1, 2, 1]
             )
         )
 
-    else:
 
-        radio_index = None
+        if five_mid.button(
+
+            choices[4],
+
+            use_container_width=True,
+
+            type=(
+                "primary"
+                if previous == choices[4]
+                else "secondary"
+            ),
+
+            key=
+                f"ans_{q}_5",
+        ):
+
+            st.session_state.answers[q] = (
+                choices[4]
+            )
+
+            st.rerun()
 
 
-    answer = st.radio(
-
-        "답안",
-
-        question["choices"],
-
-        index=
-            radio_index,
-
-        label_visibility=
-            "collapsed",
-
-        key=
-            f"radio_q_{q}",
-    )
+    st.write("")
 
 
     previous_col, next_col = st.columns(
-        [1, 2]
+        [1,2]
     )
 
-
-    # 이전 버튼
 
     with previous_col:
 
@@ -2186,13 +1704,6 @@ def test_page():
                     f"prev_{q}",
             ):
 
-                if answer is not None:
-
-                    save_current_answer(
-                        answer
-                    )
-
-
                 st.session_state.question_no -= 1
 
                 st.session_state.question_started_at = (
@@ -2201,8 +1712,6 @@ def test_page():
 
                 st.rerun()
 
-
-    # 다음 버튼
 
     with next_col:
 
@@ -2228,7 +1737,12 @@ def test_page():
                 f"next_{q}",
         ):
 
-            if answer is None:
+            selected_answer = (
+                st.session_state.answers.get(q)
+            )
+
+
+            if not selected_answer:
 
                 st.warning(
                     "답을 선택해주세요."
@@ -2238,7 +1752,7 @@ def test_page():
             else:
 
                 save_current_answer(
-                    answer
+                    selected_answer
                 )
 
 
@@ -2262,7 +1776,7 @@ def test_page():
 
 
 # =========================================================
-# RESULT PAGE
+# RESULT
 # =========================================================
 
 def result_page():
@@ -2283,25 +1797,19 @@ def result_page():
     )
 
 
-    if difference >= 0:
+    difference_text = (
 
-        difference_text = (
-            "+"
-            +
-            mmss(difference)
+        ("+" if difference >= 0 else "-")
+
+        +
+
+        mmss(
+            abs(difference)
         )
-
-    else:
-
-        difference_text = (
-            "-"
-            +
-            mmss(abs(difference))
-        )
+    )
 
 
     st.html(
-
         f"""
         <div class="result-hero">
 
@@ -2368,10 +1876,6 @@ def result_page():
     )
 
 
-    # -----------------------------------------------------
-    # 영역별 정확도
-    # -----------------------------------------------------
-
     bars = ""
 
 
@@ -2409,7 +1913,6 @@ def result_page():
 
 
     st.html(
-
         f"""
         <div class="result-card">
 
@@ -2424,10 +1927,6 @@ def result_page():
     )
 
 
-    # -----------------------------------------------------
-    # 영역별 시간
-    # -----------------------------------------------------
-
     time_boxes = ""
 
 
@@ -2440,21 +1939,16 @@ def result_page():
         )
 
 
-        if over >= 0:
+        over_text = (
 
-            over_text = (
-                "+"
-                +
-                mmss(over)
+            ("+" if over >= 0 else "-")
+
+            +
+
+            mmss(
+                abs(over)
             )
-
-        else:
-
-            over_text = (
-                "-"
-                +
-                mmss(abs(over))
-            )
+        )
 
 
         time_boxes += f"""
@@ -2483,7 +1977,6 @@ def result_page():
 
 
     st.html(
-
         f"""
         <div class="result-card">
 
@@ -2492,19 +1985,13 @@ def result_page():
             </div>
 
             <div class="time-grid">
-
                 {time_boxes}
-
             </div>
 
         </div>
         """
     )
 
-
-    # -----------------------------------------------------
-    # 추천
-    # -----------------------------------------------------
 
     st.html(
         """
@@ -2566,10 +2053,6 @@ def result_page():
             st.session_state.phone
         )
 
-
-    # -----------------------------------------------------
-    # 결과 저장
-    # -----------------------------------------------------
 
     if st.button(
 
@@ -2650,13 +2133,15 @@ def result_page():
                 "result_records",
         ):
 
-            st.session_state.page = "records"
+            st.session_state.page = (
+                "records"
+            )
 
             st.rerun()
 
 
 # =========================================================
-# RECORDS PAGE
+# RECORDS
 # =========================================================
 
 def records_page():
@@ -2668,8 +2153,7 @@ def records_page():
         </div>
 
         <div class="records-sub">
-            결과 전달을 희망한 연락처와
-            점검 결과를 간단히 확인합니다.
+            연락처와 점검 결과를 간단히 확인합니다.
         </div>
         """
     )
@@ -2699,7 +2183,6 @@ def records_page():
 
 
             st.html(
-
                 f"""
                 <div class="record-card">
 
@@ -2718,18 +2201,14 @@ def records_page():
                             </div>
 
                             <div class="record-meta">
-
                                 {record["time"]}
-
                             </div>
 
                         </div>
 
 
                         <div class="record-phone">
-
                             {phone}
-
                         </div>
 
                     </div>
