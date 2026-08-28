@@ -13,6 +13,17 @@ from question_bank.elementary.grade2_english import QUESTION_SET as E2_ENG_SET
 from question_bank.elementary.grade2_math import QUESTION_SET as E2_MATH_SET
 from question_bank.elementary.grade3_english import QUESTION_SET as E3_ENG_SET
 from question_bank.elementary.grade3_math import QUESTION_SET as E3_MATH_SET
+from question_bank.elementary.grade4_english import QUESTION_SET as E4_ENG_SET
+from question_bank.elementary.grade4_math import QUESTION_SET as E4_MATH_SET
+from question_bank.elementary.grade5_english import QUESTION_SET as E5_ENG_SET
+from question_bank.elementary.grade5_math import QUESTION_SET as E5_MATH_SET
+from question_bank.elementary.grade6_english import QUESTION_SET as E6_ENG_SET
+from question_bank.elementary.grade6_math import QUESTION_SET as E6_MATH_SET
+from question_bank.middle.grade1_english import QUESTION_SET as M1_ENG_SET
+from question_bank.middle.grade1_math import QUESTION_SET as M1_MATH_SET
+from question_bank.middle.grade2_english import QUESTION_SET as M2_ENG_SET
+from question_bank.middle.grade3_english import QUESTION_SET as M3_ENG_SET
+from question_bank.middle.grade3_math import QUESTION_SET as M3_MATH_SET
 
 
 def normalize_question(question):
@@ -50,6 +61,17 @@ QUESTION_SETS = {
     ("초2", "수학"): E2_MATH_SET,
     ("초3", "영어"): E3_ENG_SET,
     ("초3", "수학"): E3_MATH_SET,
+    ("초4", "영어"): E4_ENG_SET,
+    ("초4", "수학"): E4_MATH_SET,
+    ("초5", "영어"): E5_ENG_SET,
+    ("초5", "수학"): E5_MATH_SET,
+    ("초6", "영어"): E6_ENG_SET,
+    ("초6", "수학"): E6_MATH_SET,
+    ("중1", "영어"): M1_ENG_SET,
+    ("중1", "수학"): M1_MATH_SET,
+    ("중2", "영어"): M2_ENG_SET,
+    ("중3", "영어"): M3_ENG_SET,
+    ("중3", "수학"): M3_MATH_SET,
 }
 
 
