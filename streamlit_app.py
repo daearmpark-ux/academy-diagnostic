@@ -47,7 +47,7 @@ def is_preschool(level):
 
 
 def is_elementary(level):
-    return level in {"초1", "초2", "초3"}
+    return level in {"초1", "초2", "초3", "초4", "초5", "초6"}
 
 
 def subjects_for(level):
@@ -2532,6 +2532,29 @@ def result_page():
             if result["core_correct"] >= 6
             else "기초 경험부터 차근차근 재확인 권장"
         )
+        st.html(
+            f"""
+            <div class="result-card">
+                <div class="card-title">입학준비 기초 진단</div>
+                <div class="recommend">
+                    <div class="r-label">CORE 13문항</div>
+                    <div class="r-text">{result["core_correct"]} / 13 · {result["accuracy"]}%</div>
+                </div>
+                <div class="recommend">
+                    <div class="r-label">현재 단계 진단</div>
+                    <div class="r-text">{core_signal}</div>
+                </div>
+            </div>
+            <div class="result-card">
+                <div class="card-title">다음 단계 진입 탐색</div>
+                <div class="recommend">
+                    <div class="r-label">ADVANCE_PROBE</div>
+                    <div class="r-text">{result["advance_correct"]} / {result["advance_total"]}</div>
+                    <div class="t-sub">{result["advance_interpretation"]}</div>
+                </div>
+            </div>
+            """
+        )
 
     elif elementary:
         core_signal = (
@@ -2566,31 +2589,6 @@ def result_page():
             </div>
             """
         )
-        st.html(
-            f"""
-            <div class="result-card">
-                <div class="card-title">입학준비 기초 진단</div>
-                <div class="recommend">
-                    <div class="r-label">CORE 13문항</div>
-                    <div class="r-text">{result["core_correct"]} / 13 · {result["accuracy"]}%</div>
-                </div>
-                <div class="recommend">
-                    <div class="r-label">현재 단계 진단</div>
-                    <div class="r-text">{core_signal}</div>
-                </div>
-            </div>
-            <div class="result-card">
-                <div class="card-title">다음 단계 진입 탐색</div>
-                <div class="recommend">
-                    <div class="r-label">ADVANCE_PROBE</div>
-                    <div class="r-text">{result["advance_correct"]} / {result["advance_total"]}</div>
-                    <div class="t-sub">{result["advance_interpretation"]}</div>
-                </div>
-            </div>
-            """
-        )
-
-
     bars = ""
 
 
@@ -3058,6 +3056,11 @@ def record_detail_page():
         and record.get("subject") == "수학"
         else "CORE 13문항 정확도"
         if record.get("level") in {"5세", "6세", "7세"}
+        else "기초영어 진단"
+        if record.get("level") in {"초1", "초2", "초3", "초4", "초5", "초6"}
+        and record.get("subject") == "영어"
+        else "현재 단계 진단 정확도"
+        if record.get("level") in {"초1", "초2", "초3", "초4", "초5", "초6"}
         else "전체 정확도"
     )
 

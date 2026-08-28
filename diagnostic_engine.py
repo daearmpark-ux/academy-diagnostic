@@ -46,10 +46,15 @@ def area_diagnostic(data):
         elif accuracy < 50:
             if time_ratio <= 0.5:
                 messages.append("매우 짧은 응답시간과 오답이 함께 나타나 개념 이해 여부를 한 번 더 확인하는 것을 권장합니다.")
-            else:
+            elif preschool:
                 messages.append("일부 문항에서 어려움이 나타나 핵심 개념을 차근차근 다시 확인하는 것을 권장합니다.")
+            else:
+                messages.append("일부 문항에서 어려움이 나타나 해당 개념을 다시 확인하는 것을 권장합니다.")
         else:
-            messages.append("일부 문항에서 어려움이 나타나 해당 개념을 놀이처럼 다시 접해보는 것을 권장합니다.")
+            if preschool:
+                messages.append("일부 문항에서 어려움이 나타나 해당 개념을 놀이처럼 다시 접해보는 것을 권장합니다.")
+            else:
+                messages.append("일부 문항에서 어려움이 나타나 해당 개념을 다시 확인하는 것을 권장합니다.")
         return " ".join(messages)
     if accuracy >= 80:
         messages.append("이번 검사에서는 정답률이 높아 기본 개념 적용에 강점 신호가 보입니다.")
