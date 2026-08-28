@@ -137,7 +137,7 @@ def supabase_ready():
         return bool(
             st.secrets["SUPABASE_URL"]
             and
-            st.secrets["SUPABASE_KEY"]
+            st.secrets["SUPABASE_SECRET_KEY"]
         )
 
     except Exception:
@@ -147,7 +147,7 @@ def supabase_ready():
 
 def supabase_headers():
 
-    key = st.secrets["SUPABASE_KEY"]
+    key = st.secrets["SUPABASE_SECRET_KEY"]
 
     return {
         "apikey": key,
