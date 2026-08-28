@@ -46,6 +46,10 @@ def is_preschool(level):
     return level in {"5세", "6세", "7세"}
 
 
+def is_elementary(level):
+    return level in {"초1", "초2", "초3"}
+
+
 def subjects_for(level):
 
     if level in {"초1", "초2"}:
@@ -299,6 +303,7 @@ def build_result():
         and st.session_state.get("subject") == "수학"
     )
     preschool = is_preschool(st.session_state.get("level"))
+    elementary = is_elementary(st.session_state.get("level"))
     return calculate_result(
         questions,
         st.session_state.answers,
@@ -306,6 +311,7 @@ def build_result():
         is_m2_math=is_m2_math,
         is_preschool=preschool,
         preschool_level=st.session_state.get("level"),
+        is_elementary=elementary,
     )
 
 # =========================================================
@@ -339,8 +345,9 @@ def save_result_once():
         and
         st.session_state.subject == "수학"
     )
+    elementary = is_elementary(st.session_state.level)
 
-    if is_m2_math or is_preschool(st.session_state.level):
+    if is_m2_math or is_preschool(st.session_state.level) or elementary:
         answers_for_storage = {}
         question_set = current_question_set()
 
@@ -402,7 +409,7 @@ def save_result_once():
             result["pass_count"],
 
         "total_questions":
-            result["core_total"] if is_preschool(st.session_state.level) else result["total_questions"],
+            result["core_total"] if (is_preschool(st.session_state.level) or elementary) else result["total_questions"],
 
         "total_seconds":
             result["total_time"],
@@ -2378,12 +2385,17 @@ def result_page():
     save_result_once()
 
     preschool = is_preschool(st.session_state.level)
+    elementary = is_elementary(st.session_state.level)
     accuracy_label = (
         "현재 학년 진단 정확도"
         if st.session_state.level == "중2"
         and st.session_state.subject == "수학"
         else "CORE 13문항 정확도" if preschool else "전체 정확도"
     )
+    if elementary and st.session_state.subject == "영어":
+        accuracy_label = "기초영어 진단"
+    elif elementary:
+        accuracy_label = "현재 단계 진단 정확도"
 
 
     difference = (
@@ -2413,7 +2425,7 @@ def result_page():
 
             <div class="result-sub">
                 {st.session_state.student_name}
-                학생의 입학준비 기초 진단 결과입니다.
+                학생의 {"입학준비 기초 진단" if preschool else "학습점검"} 결과입니다.
             </div>
 
         </div>
@@ -2467,7 +2479,7 @@ def result_page():
                 </div>
 
                 <div class="value">
-                    {result["all_pass_count"] if preschool else result["pass_count"]}개
+                    {result["all_pass_count"] if (preschool or elementary) else result["pass_count"]}개
                 </div>
 
             </div>
@@ -2519,6 +2531,40 @@ def result_page():
             else "영역별 기초 개념 추가 확인 권장"
             if result["core_correct"] >= 6
             else "기초 경험부터 차근차근 재확인 권장"
+        )
+
+    elif elementary:
+        core_signal = (
+            "현재 학년 핵심 개념 안정"
+            if result["core_correct"] >= 11
+            else "대체로 안정 · 일부 보완 필요"
+            if result["core_correct"] >= 9
+            else "영역별 핵심 개념 추가 확인 필요"
+            if result["core_correct"] >= 6
+            else "선수 개념부터 재점검 권장"
+        )
+        st.html(
+            f"""
+            <div class="result-card">
+                <div class="card-title">{('기초영어 진단' if st.session_state.subject == '영어' else '현재 단계 진단')}</div>
+                <div class="recommend">
+                    <div class="r-label">CORE 13문항</div>
+                    <div class="r-text">{result["core_correct"]} / 13 · {result["accuracy"]}%</div>
+                </div>
+                <div class="recommend">
+                    <div class="r-label">진단 신호</div>
+                    <div class="r-text">{core_signal}</div>
+                </div>
+            </div>
+            <div class="result-card">
+                <div class="card-title">다음 단계 진입 탐색</div>
+                <div class="recommend">
+                    <div class="r-label">ADVANCE_PROBE</div>
+                    <div class="r-text">{result["advance_correct"]} / {result["advance_total"]}</div>
+                    <div class="t-sub">{result["advance_interpretation"]}</div>
+                </div>
+            </div>
+            """
         )
         st.html(
             f"""

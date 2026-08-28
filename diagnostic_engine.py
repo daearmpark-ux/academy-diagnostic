@@ -31,6 +31,7 @@ def recommendation_priority(data):
 
 def area_diagnostic(data):
     preschool = data.get("preschool", False)
+    elementary = data.get("elementary", False)
     accuracy = data["accuracy"]
     time_ratio = data["actual"] / data["recommended"] if data["recommended"] else 1
     messages = []
@@ -39,14 +40,14 @@ def area_diagnostic(data):
             messages.append(f"미풀이 문항이 {data['pass']}개 있어 해당 개념을 편안한 상황에서 한 번 더 확인하는 것이 좋습니다.")
         else:
             messages.append(f"미풀이 문항이 {data['pass']}개 있어 개념 이해 여부를 직접 확인할 필요가 있습니다.")
-    if preschool:
+    if preschool or elementary:
         if accuracy >= 80 and not data["pass"]:
             messages.append("이번 검사에서는 안정적인 반응이 나타났습니다.")
         elif accuracy < 50:
             if time_ratio <= 0.5:
                 messages.append("매우 짧은 응답시간과 오답이 함께 나타나 개념 이해 여부를 한 번 더 확인하는 것을 권장합니다.")
             else:
-                messages.append("일부 문항에서 어려움이 나타나 기초 경험부터 편안하게 다시 접해보는 것을 권장합니다.")
+                messages.append("일부 문항에서 어려움이 나타나 핵심 개념을 차근차근 다시 확인하는 것을 권장합니다.")
         else:
             messages.append("일부 문항에서 어려움이 나타나 해당 개념을 놀이처럼 다시 접해보는 것을 권장합니다.")
         return " ".join(messages)
@@ -86,7 +87,7 @@ def build_recommendations(result):
 
 
 def calculate_result(questions, answers, times, is_m2_math=False, is_preschool=False,
-                     preschool_level=None):
+                     preschool_level=None, is_elementary=False):
     total_questions = len(questions)
     core_questions = [question for question in questions if question.get("score_in_core", True)]
     advance_questions = [question for question in questions if question.get("is_advance_probe", False)]
@@ -113,7 +114,7 @@ def calculate_result(questions, answers, times, is_m2_math=False, is_preschool=F
         core_actual_seconds += elapsed
         core_recommended_seconds += recommended
         area = question.get("area", "기초 개념")
-        data = areas.setdefault(area, {"answered": 0, "correct": 0, "pass": 0, "total": 0, "actual": 0, "recommended": 0, "preschool": is_preschool})
+        data = areas.setdefault(area, {"answered": 0, "correct": 0, "pass": 0, "total": 0, "actual": 0, "recommended": 0, "preschool": is_preschool, "elementary": is_elementary})
         data["total"] += 1
         data["actual"] += elapsed
         data["recommended"] += recommended
@@ -127,17 +128,17 @@ def calculate_result(questions, answers, times, is_m2_math=False, is_preschool=F
                 data["correct"] += 1
 
     attempted = core_total - passed
-    accuracy = round(correct / core_total * 100) if (is_m2_math or is_preschool) and core_total else round(correct / attempted * 100) if attempted else 0
+    accuracy = round(correct / core_total * 100) if (is_m2_math or is_preschool or is_elementary) and core_total else round(correct / attempted * 100) if attempted else 0
     area_result = {}
     for area, data in areas.items():
-        denominator = data["total"] if (is_m2_math or is_preschool) else data["answered"]
+        denominator = data["total"] if (is_m2_math or is_preschool or is_elementary) else data["answered"]
         area_result[area] = {**data, "accuracy": round(data["correct"] / denominator * 100) if denominator else 0}
     if advance_correct == len(advance_questions) and advance_questions:
-        advance_interpretation = "초등 학습 기초 진입 신호 있음" if preschool_level == "7세" else "다음 단계 개념을 받아들일 준비 신호 있음"
+        advance_interpretation = "초등 학습 기초 진입 신호 있음" if preschool_level == "7세" else "다음 단계 개념 진입 신호 있음"
     elif advance_correct:
         advance_interpretation = "다음 단계 개념 일부 인지 · 추가 확인 필요" if is_preschool else "상위 학년 개념 일부 인지 · 추가 확인 필요"
     else:
-        advance_interpretation = "현재 단계 기초 경험 우선" if is_preschool else "현재 학년 핵심 개념 안정화 우선"
+        advance_interpretation = "현재 단계 기초 경험 우선" if is_preschool else "현재 단계 핵심 개념 안정화 우선" if is_elementary else "현재 학년 핵심 개념 안정화 우선"
     return {
         "accuracy": accuracy, "correct": correct, "core_correct": correct,
         "core_total": core_total, "pass_count": passed, "attempted": attempted,
@@ -149,4 +150,5 @@ def calculate_result(questions, answers, times, is_m2_math=False, is_preschool=F
         "advance_total": len(advance_questions), "advance_interpretation": advance_interpretation,
         "areas": area_result,
         "is_preschool": is_preschool,
+        "is_elementary": is_elementary,
     }

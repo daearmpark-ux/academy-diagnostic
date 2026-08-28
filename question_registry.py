@@ -5,6 +5,14 @@ from question_bank.placeholder import PLACEHOLDER_QUESTIONS
 from question_bank.preschool.age5 import QUESTION_SET as P5_SET
 from question_bank.preschool.age6 import QUESTION_SET as P6_SET
 from question_bank.preschool.age7 import QUESTION_SET as P7_SET
+from question_bank.elementary.grade1_korean import QUESTION_SET as E1_KOR_SET
+from question_bank.elementary.grade1_english import QUESTION_SET as E1_ENG_SET
+from question_bank.elementary.grade1_math import QUESTION_SET as E1_MATH_SET
+from question_bank.elementary.grade2_korean import QUESTION_SET as E2_KOR_SET
+from question_bank.elementary.grade2_english import QUESTION_SET as E2_ENG_SET
+from question_bank.elementary.grade2_math import QUESTION_SET as E2_MATH_SET
+from question_bank.elementary.grade3_english import QUESTION_SET as E3_ENG_SET
+from question_bank.elementary.grade3_math import QUESTION_SET as E3_MATH_SET
 
 
 def normalize_question(question):
@@ -34,6 +42,14 @@ QUESTION_SETS = {
     ("5세", None): P5_SET,
     ("6세", None): P6_SET,
     ("7세", None): P7_SET,
+    ("초1", "국어"): E1_KOR_SET,
+    ("초1", "영어"): E1_ENG_SET,
+    ("초1", "수학"): E1_MATH_SET,
+    ("초2", "국어"): E2_KOR_SET,
+    ("초2", "영어"): E2_ENG_SET,
+    ("초2", "수학"): E2_MATH_SET,
+    ("초3", "영어"): E3_ENG_SET,
+    ("초3", "수학"): E3_MATH_SET,
 }
 
 
