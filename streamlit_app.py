@@ -136,6 +136,36 @@ def supabase_headers():
     }
 
 
+def admin_records_pin():
+
+    try:
+
+        configured_pin = st.secrets["ADMIN_RECORDS_PIN"]
+
+    except Exception:
+
+        return None
+
+    return str(configured_pin) if str(configured_pin) else None
+
+
+def validate_records_pin(entered_pin, configured_pin):
+
+    if not configured_pin:
+
+        return False, "관리자 PIN이 설정되지 않았습니다."
+
+    if not entered_pin:
+
+        return False, "PIN 번호를 입력해주세요."
+
+    if str(entered_pin) != str(configured_pin):
+
+        return False, "PIN 번호가 올바르지 않습니다."
+
+    return True, ""
+
+
 def db_insert(record):
 
     if not supabase_ready():
@@ -289,6 +319,9 @@ DEFAULTS = {
     "validation_message": "",
     "delete_confirm_id": None,
     "view_record": None,
+    "records_pin_unlocked": False,
+    "records_pin_error": "",
+    "records_pin_input": "",
 }
 
 for key, value in DEFAULTS.items():
@@ -2829,6 +2862,69 @@ def records_page():
         '</div>'
     )
 
+    if not st.session_state.records_pin_unlocked:
+
+        st.info("기록 보기는 관리자 PIN 입력 후 열람할 수 있습니다.")
+
+        if admin_records_pin() is None:
+
+            st.warning(
+                "관리자 PIN이 설정되지 않았습니다. "
+                "secrets.toml에 ADMIN_RECORDS_PIN을 추가하세요."
+            )
+
+            return
+
+        st.text_input(
+            "관리자 PIN",
+            type="password",
+            key="records_pin_input",
+        )
+
+        if st.button(
+            "기록 보기 열기",
+            type="primary",
+            use_container_width=True,
+            key="records_pin_submit",
+        ):
+
+            unlocked, pin_error = validate_records_pin(
+                st.session_state.records_pin_input,
+                admin_records_pin(),
+            )
+
+            if unlocked:
+
+                st.session_state.records_pin_unlocked = True
+                st.session_state.records_pin_error = ""
+                st.session_state.records_pin_input = ""
+                st.rerun()
+
+            else:
+
+                st.session_state.records_pin_error = pin_error
+
+        if st.session_state.records_pin_error:
+
+            st.error(st.session_state.records_pin_error)
+
+        return
+
+    lock_col, _ = st.columns([1, 3])
+
+    if lock_col.button(
+        "다시 잠그기",
+        use_container_width=True,
+        key="records_pin_lock",
+    ):
+
+        st.session_state.records_pin_unlocked = False
+        st.session_state.records_pin_error = ""
+        st.session_state.records_pin_input = ""
+        st.session_state.view_record = None
+        st.session_state.delete_confirm_id = None
+        st.rerun()
+
 
     if not supabase_ready():
 
@@ -3067,6 +3163,11 @@ def records_page():
 # =========================================================
 
 def record_detail_page():
+
+    if not st.session_state.records_pin_unlocked:
+
+        st.session_state.page = "records"
+        st.rerun()
 
     record = (
         st.session_state.view_record
