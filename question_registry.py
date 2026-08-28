@@ -2,6 +2,9 @@
 
 from question_bank.middle.grade2_math import QUESTION_SET as M2_MATH_SET
 from question_bank.placeholder import PLACEHOLDER_QUESTIONS
+from question_bank.preschool.age5 import QUESTION_SET as P5_SET
+from question_bank.preschool.age6 import QUESTION_SET as P6_SET
+from question_bank.preschool.age7 import QUESTION_SET as P7_SET
 
 
 def normalize_question(question):
@@ -25,6 +28,12 @@ def normalize_question(question):
 
 QUESTION_SETS = {
     ("중2", "수학"): M2_MATH_SET,
+    ("5세", "입학준비"): P5_SET,
+    ("6세", "입학준비"): P6_SET,
+    ("7세", "입학준비"): P7_SET,
+    ("5세", None): P5_SET,
+    ("6세", None): P6_SET,
+    ("7세", None): P7_SET,
 }
 
 

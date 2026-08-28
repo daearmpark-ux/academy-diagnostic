@@ -298,11 +298,14 @@ def build_result():
         st.session_state.get("level") == "중2"
         and st.session_state.get("subject") == "수학"
     )
+    preschool = is_preschool(st.session_state.get("level"))
     return calculate_result(
         questions,
         st.session_state.answers,
         st.session_state.times,
         is_m2_math=is_m2_math,
+        is_preschool=preschool,
+        preschool_level=st.session_state.get("level"),
     )
 
 # =========================================================
@@ -337,7 +340,7 @@ def save_result_once():
         st.session_state.subject == "수학"
     )
 
-    if is_m2_math:
+    if is_m2_math or is_preschool(st.session_state.level):
         answers_for_storage = {}
         question_set = current_question_set()
 
@@ -399,7 +402,7 @@ def save_result_once():
             result["pass_count"],
 
         "total_questions":
-            result["total_questions"],
+            result["core_total"] if is_preschool(st.session_state.level) else result["total_questions"],
 
         "total_seconds":
             result["total_time"],
@@ -1838,7 +1841,7 @@ def home_page():
                 if is_preschool(level):
 
                     st.session_state.subject = (
-                        "한글 · 수 개념"
+                        "입학준비"
                     )
 
 
@@ -1851,7 +1854,6 @@ def home_page():
                     st.session_state.subject = (
                         None
                     )
-
 
                 st.session_state.validation_message = (
                     ""
@@ -2146,6 +2148,9 @@ def test_page():
         """
     )
 
+    if is_preschool(st.session_state.level):
+        st.info("문장 읽기는 보호자가 도와도 됩니다. 보기 글자는 대신 읽지 않는 것을 권장합니다.")
+
 
     choices = question["choices"]
 
@@ -2372,11 +2377,12 @@ def result_page():
 
     save_result_once()
 
+    preschool = is_preschool(st.session_state.level)
     accuracy_label = (
         "현재 학년 진단 정확도"
         if st.session_state.level == "중2"
         and st.session_state.subject == "수학"
-        else "전체 정확도"
+        else "CORE 13문항 정확도" if preschool else "전체 정확도"
     )
 
 
@@ -2407,7 +2413,7 @@ def result_page():
 
             <div class="result-sub">
                 {st.session_state.student_name}
-                학생의 현재 학습상태입니다.
+                학생의 입학준비 기초 진단 결과입니다.
             </div>
 
         </div>
@@ -2461,7 +2467,7 @@ def result_page():
                 </div>
 
                 <div class="value">
-                    {result["pass_count"]}개
+                    {result["all_pass_count"] if preschool else result["pass_count"]}개
                 </div>
 
             </div>
@@ -2495,6 +2501,40 @@ def result_page():
 
             <div class="result-card">
                 <div class="card-title">상위 과정 진입 탐색</div>
+                <div class="recommend">
+                    <div class="r-label">ADVANCE_PROBE</div>
+                    <div class="r-text">{result["advance_correct"]} / {result["advance_total"]}</div>
+                    <div class="t-sub">{result["advance_interpretation"]}</div>
+                </div>
+            </div>
+            """
+        )
+
+    elif preschool:
+        core_signal = (
+            "현재 단계 핵심 기초가 안정적인 신호"
+            if result["core_correct"] >= 11
+            else "대체로 안정 · 일부 영역 추가 확인 권장"
+            if result["core_correct"] >= 9
+            else "영역별 기초 개념 추가 확인 권장"
+            if result["core_correct"] >= 6
+            else "기초 경험부터 차근차근 재확인 권장"
+        )
+        st.html(
+            f"""
+            <div class="result-card">
+                <div class="card-title">입학준비 기초 진단</div>
+                <div class="recommend">
+                    <div class="r-label">CORE 13문항</div>
+                    <div class="r-text">{result["core_correct"]} / 13 · {result["accuracy"]}%</div>
+                </div>
+                <div class="recommend">
+                    <div class="r-label">현재 단계 진단</div>
+                    <div class="r-text">{core_signal}</div>
+                </div>
+            </div>
+            <div class="result-card">
+                <div class="card-title">다음 단계 진입 탐색</div>
                 <div class="recommend">
                     <div class="r-label">ADVANCE_PROBE</div>
                     <div class="r-text">{result["advance_correct"]} / {result["advance_total"]}</div>
@@ -2970,6 +3010,8 @@ def record_detail_page():
         "현재 학년 진단 정확도"
         if record.get("level") == "중2"
         and record.get("subject") == "수학"
+        else "CORE 13문항 정확도"
+        if record.get("level") in {"5세", "6세", "7세"}
         else "전체 정확도"
     )
 
@@ -3125,10 +3167,16 @@ def record_detail_page():
 
     if answer_metadata.get("advance_total") == 2:
 
+        advance_title = (
+            "다음 단계 진입 탐색"
+            if record.get("level") in {"5세", "6세", "7세"}
+            else "상위 과정 진입 탐색"
+        )
+
         st.html(
             f"""
             <div class="result-card">
-                <div class="card-title">상위 과정 진입 탐색</div>
+                <div class="card-title">{advance_title}</div>
                 <div class="recommend">
                     <div class="r-label">ADVANCE_PROBE</div>
                     <div class="r-text">{answer_metadata.get("advance_correct", 0)} / 2</div>
