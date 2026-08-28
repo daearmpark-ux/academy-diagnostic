@@ -13,6 +13,7 @@ from diagnostic_engine import (
     time_difference_text,
 )
 from question_registry import get_question_set, get_questions
+from pilot_export import build_export_csvs, export_date
 
 
 # =========================================================
@@ -194,6 +195,50 @@ def db_list():
     except Exception:
 
         return []
+
+
+def db_list_all_for_export(page_size=500):
+
+    if not supabase_ready():
+
+        return []
+
+    records = []
+    offset = 0
+
+    try:
+
+        while True:
+
+            url = (
+                st.secrets["SUPABASE_URL"].rstrip("/")
+                + "/rest/v1/diagnostic_records"
+                + f"?select=*&order=created_at.desc&limit={page_size}&offset={offset}"
+            )
+
+            response = requests.get(
+                url,
+                headers=supabase_headers(),
+                timeout=10,
+            )
+            response.raise_for_status()
+            page = response.json()
+
+            if not isinstance(page, list):
+                return records
+
+            records.extend(page)
+            if len(page) < page_size:
+                return records
+
+            offset += page_size
+
+            if offset > 1000000:
+                return records
+
+    except Exception:
+
+        return records
 
 
 def db_delete(record_id):
@@ -2798,6 +2843,45 @@ def records_page():
     else:
 
         records = db_list()
+
+
+    if supabase_ready():
+
+        st.html(
+            '<div class="result-card">'
+            '<div class="card-title">파일럿 데이터 내보내기</div>'
+            '<div class="helper">학생 개인정보를 제외한 분석용 데이터를 CSV로 내보냅니다.</div>'
+            '</div>'
+        )
+
+        export_records = db_list_all_for_export()
+
+        if not export_records:
+
+            st.info("내보낼 기록이 없습니다.")
+
+        else:
+
+            attempts_csv, items_csv = build_export_csvs(export_records)
+            today = export_date()
+            download_col, item_col = st.columns(2)
+
+            download_col.download_button(
+                "파일럿 요약 CSV 내려받기",
+                data=attempts_csv,
+                file_name=f"academy_pilot_attempts_{today}.csv",
+                mime="text/csv",
+                key="pilot_attempts_csv_download",
+                use_container_width=True,
+            )
+            item_col.download_button(
+                "문항별 분석 CSV 내려받기",
+                data=items_csv,
+                file_name=f"academy_pilot_items_{today}.csv",
+                mime="text/csv",
+                key="pilot_items_csv_download",
+                use_container_width=True,
+            )
 
 
     if not records:
