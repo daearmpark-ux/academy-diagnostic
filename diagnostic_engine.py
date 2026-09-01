@@ -91,6 +91,96 @@ def build_recommendations(result):
     return {"strong": strong, "priority": priority, "needs_review": needs_review}
 
 
+def dedupe_preserve_order(items):
+    seen = set()
+    unique = []
+    for item in items:
+        normalized = item.strip() if isinstance(item, str) else item
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        unique.append(normalized)
+    return unique
+
+
+def build_result_view_model(result, level, subject, student_name="", phone="",
+                            test_version="", created_at="", legacy=False):
+    preschool = level in {"5세", "6세", "7세"}
+    elementary = level in {"초1", "초2", "초3", "초4", "초5", "초6"}
+    is_m2_math = level == "중2" and subject == "수학"
+    if is_m2_math:
+        diagnostic_title = "현재 학년 진단"
+        diagnostic_signal = (
+            "핵심 개념 안정" if result["core_correct"] >= 11 else
+            "대체로 안정 · 일부 보완 필요" if result["core_correct"] >= 9 else
+            "영역별 학습 결손 확인 필요" if result["core_correct"] >= 6 else
+            "선수 개념부터 재점검 권장"
+        )
+    elif preschool:
+        diagnostic_title = "입학준비 기초 진단"
+        diagnostic_signal = (
+            "현재 단계 핵심 기초가 안정적인 신호" if result["core_correct"] >= 11 else
+            "대체로 안정 · 일부 영역 추가 확인 권장" if result["core_correct"] >= 9 else
+            "영역별 기초 개념 추가 확인 권장" if result["core_correct"] >= 6 else
+            "기초 경험부터 차근차근 재확인 권장"
+        )
+    else:
+        diagnostic_title = "기초영어 진단" if elementary and subject == "영어" else "현재 단계 진단" if elementary else "현재 학년 진단"
+        diagnostic_signal = (
+            "현재 학년 핵심 개념 안정" if elementary and result["core_correct"] >= 11 else
+            "대체로 안정 · 일부 보완 필요" if result["core_correct"] >= 9 else
+            "영역별 핵심 개념 추가 확인 필요" if elementary and result["core_correct"] >= 6 else
+            "선수 개념부터 재점검 권장" if elementary else
+            "현재 학년 핵심 개념 안정화 우선"
+        )
+
+    recommendation_groups = []
+    try:
+        recommendations = build_recommendations(result)
+    except (KeyError, TypeError):
+        recommendations = {"strong": [], "priority": [], "needs_review": []}
+    for label, key in (("강점 신호", "strong"), ("우선 보완", "priority"), ("추가 확인", "needs_review")):
+        items = recommendations[key]
+        if not items:
+            continue
+        messages = []
+        for _, data in items[:2]:
+            try:
+                messages.append(area_diagnostic(data))
+            except (KeyError, TypeError, ZeroDivisionError):
+                continue
+        recommendation_groups.append({
+            "label": label,
+            "areas": [area for area, _ in items],
+            "messages": dedupe_preserve_order(messages),
+        })
+
+    return {
+        "student_name": student_name,
+        "phone": phone,
+        "level": level,
+        "subject": subject,
+        "test_version": test_version,
+        "created_at": created_at,
+        "legacy": legacy,
+        "accuracy": result["accuracy"],
+        "core_correct": result["core_correct"],
+        "core_total": result["core_total"],
+        "core_pass": result["pass_count"],
+        "total_pass": result["all_pass_count"],
+        "total_seconds": result["total_seconds"],
+        "recommended_seconds": result["recommended_total"],
+        "time_difference": time_difference_text(result["total_seconds"], result["recommended_total"]),
+        "areas": result["areas"],
+        "diagnostic_title": diagnostic_title,
+        "diagnostic_signal": diagnostic_signal,
+        "recommendation_groups": recommendation_groups,
+        "advance_correct": result["advance_correct"],
+        "advance_total": result["advance_total"],
+        "advance_interpretation": result["advance_interpretation"],
+    }
+
+
 def calculate_result(questions, answers, times, is_m2_math=False, is_preschool=False,
                      preschool_level=None, is_elementary=False):
     total_questions = len(questions)
