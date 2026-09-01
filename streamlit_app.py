@@ -3018,7 +3018,6 @@ def records_page():
 
                 st.session_state.records_pin_unlocked = True
                 st.session_state.records_pin_error = ""
-                st.session_state.records_pin_input = ""
                 st.rerun()
 
             else:
@@ -3041,7 +3040,7 @@ def records_page():
 
         st.session_state.records_pin_unlocked = False
         st.session_state.records_pin_error = ""
-        st.session_state.records_pin_input = ""
+        st.session_state.pop("records_pin_input", None)
         st.session_state.view_record = None
         st.session_state.delete_confirm_id = None
         st.rerun()
