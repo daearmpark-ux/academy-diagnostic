@@ -915,8 +915,15 @@ div.stButton
     text-align:
         center !important;
 
+    white-space:
+        nowrap !important;
+
+    padding:
+        .2rem
+        .25rem !important;
+
     font-size:
-        28px !important;
+        48px !important;
 }
 
 
@@ -941,8 +948,15 @@ div.stButton
     text-align:
         center !important;
 
+    white-space:
+        nowrap !important;
+
+    padding:
+        .2rem
+        .25rem !important;
+
     font-size:
-        30px !important;
+        48px !important;
 }
 
 
