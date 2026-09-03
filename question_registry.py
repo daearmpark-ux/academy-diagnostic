@@ -26,6 +26,8 @@ from question_bank.middle.grade2_english import QUESTION_SET as M2_ENG_SET
 from question_bank.middle.grade3_english import QUESTION_SET as M3_ENG_SET
 from question_bank.middle.grade3_math import QUESTION_SET as M3_MATH_SET
 
+__all__ = ("get_question_set", "get_questions", "get_guardian_checklist")
+
 
 def normalize_question(question):
     """Return the small compatibility schema consumed by the app."""
