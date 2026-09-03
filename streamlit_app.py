@@ -907,6 +907,19 @@ div.stButton
 }
 
 
+[class*="st-key-organization-grid"] div.stButton > button {
+
+    min-height:
+        90px !important;
+
+    text-align:
+        center !important;
+
+    font-size:
+        16px !important;
+}
+
+
 /* HOME */
 
 .hero {
@@ -2205,11 +2218,19 @@ def home_page():
             st.rerun()
     if not st.session_state.get("selected_organization_code"):
         st.title("사용 소속을 선택해주세요")
-        for organization in ORGANIZATIONS:
-            if st.button(f"{organization['name']} · {organization['type']}", key=f"org_{organization['code']}", use_container_width=True):
-                st.session_state.selected_organization_code = organization["code"]
-                st.session_state.selected_organization_name = organization["name"]
-                st.rerun()
+        with st.container(key="organization_grid"):
+            for row_start in range(0, len(ORGANIZATIONS), 2):
+                row = ORGANIZATIONS[row_start:row_start + 2]
+                if len(row) == 2:
+                    columns = st.columns(2)
+                else:
+                    columns = st.columns([1, 2, 1])
+                    columns = [columns[1]]
+                for column, organization in zip(columns, row):
+                    if column.button(organization["name"], key=f"org_{organization['code']}", use_container_width=True):
+                        st.session_state.selected_organization_code = organization["code"]
+                        st.session_state.selected_organization_name = organization["name"]
+                        st.rerun()
         return
     if not st.session_state.get("selected_assessment_mode"):
         st.title("점검을 선택해주세요")
