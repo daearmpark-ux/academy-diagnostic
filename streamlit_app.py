@@ -388,7 +388,7 @@ def context_navigation():
         </style>
     """)
     with st.container(key="organization-navigation"):
-        organization_column, assessment_column, records_column = st.columns([4, 3.5, 2])
+        organization_column, assessment_column, records_column = st.columns(3, gap="medium")
         with organization_column.container(key="nav-organization"):
             if st.button("소속 선택하기", key="nav_organization", use_container_width=True):
                 st.session_state.selected_organization_code = None
@@ -958,6 +958,34 @@ div.stButton
 }
 
 
+[class*="st-key-organization-grid"] div.stButton > button {
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    line-height:
+        1.2 !important;
+}
+
+
+[class*="st-key-organization-grid"] div.stButton > button > div,
+[class*="st-key-organization-grid"] div.stButton > button p,
+[class*="st-key-organization-grid"] div.stButton > button span {
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+}
+
+
 [class*="st-key-organization-selection"] h1 {
 
     text-align:
@@ -993,12 +1021,40 @@ div.stButton
 }
 
 
+[class*="st-key-organization-bureau"] div.stButton > button {
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    line-height:
+        1.2 !important;
+}
+
+
+[class*="st-key-organization-bureau"] div.stButton > button > div,
+[class*="st-key-organization-bureau"] div.stButton > button p,
+[class*="st-key-organization-bureau"] div.stButton > button span {
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+}
+
+
 [class*="st-key-organization-navigation"] div.stButton > button,
 [class*="st-key-organization-navigation"] div.stButton > button p,
 [class*="st-key-organization-navigation"] div.stButton > button span {
 
     min-height:
-        48px !important;
+        90px !important;
 
     text-align:
         center !important;
@@ -1031,13 +1087,33 @@ div.stButton
 
     gap:
         2px !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    line-height:
+        1.2 !important;
 }
 
 
-[class*="st-key-organization-navigation"] div.stButton > button p {
+[class*="st-key-organization-navigation"] div.stButton > button > div,
+[class*="st-key-organization-navigation"] div.stButton > button p,
+[class*="st-key-organization-navigation"] div.stButton > button span {
 
     margin:
         0 !important;
+
+    padding:
+        0 !important;
+
+    line-height:
+        1.2 !important;
 }
 
 
@@ -1076,6 +1152,37 @@ div.stButton
 
     font-size:
         24px !important;
+}
+
+
+[class*="st-key-assessment-selection"] div.stButton > button {
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    line-height:
+        1.2 !important;
+}
+
+
+[class*="st-key-assessment-selection"] div.stButton > button > div,
+[class*="st-key-assessment-selection"] div.stButton > button p,
+[class*="st-key-assessment-selection"] div.stButton > button span {
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    line-height:
+        1.2 !important;
 }
 
 
