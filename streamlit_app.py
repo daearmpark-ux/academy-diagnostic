@@ -390,7 +390,7 @@ def context_navigation():
     with st.container(key="organization-navigation"):
         organization_column, assessment_column, records_column = st.columns(3, gap="medium")
         with organization_column.container(key="nav-organization"):
-            if st.button("소속 선택하기", key="nav_organization", use_container_width=True):
+            if st.button("소속변경", key="nav_organization", use_container_width=True):
                 st.session_state.selected_organization_code = None
                 st.session_state.selected_organization_name = None
                 st.session_state.selected_assessment_mode = None
@@ -398,13 +398,13 @@ def context_navigation():
                 st.session_state.page = "home"
                 st.rerun()
         with assessment_column.container(key="nav-assessment"):
-            if st.button("점검 선택하기", key="nav_assessment", use_container_width=True):
+            if st.button("점검변경", key="nav_assessment", use_container_width=True):
                 st.session_state.selected_assessment_mode = None
                 reset_in_progress()
                 st.session_state.page = "home"
                 st.rerun()
         with records_column.container(key="nav-records"):
-            if st.button("기록 보기", key="nav_records", use_container_width=True):
+            if st.button("기록보기", key="nav_records", use_container_width=True):
                 st.session_state.page = "records"
                 st.rerun()
 
@@ -1054,7 +1054,7 @@ div.stButton
 [class*="st-key-organization-navigation"] div.stButton > button span {
 
     min-height:
-        90px !important;
+        68px !important;
 
     text-align:
         center !important;
@@ -1135,7 +1135,7 @@ div.stButton
 [class*="st-key-assessment-selection"] div.stButton > button span {
 
     min-height:
-        90px !important;
+        68px !important;
 
     text-align:
         center !important;
@@ -1152,6 +1152,76 @@ div.stButton
 
     font-size:
         24px !important;
+}
+
+
+[class*="st-key-assessment-selection"] div.stButton > button {
+
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    gap:
+        4px !important;
+
+    line-height:
+        1.2 !important;
+}
+
+
+[class*="st-key-assessment-selection"] div.stButton > button > div,
+[class*="st-key-assessment-selection"] div.stButton > button p,
+[class*="st-key-assessment-selection"] div.stButton > button span {
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    line-height:
+        1.2 !important;
+}
+
+
+[class*="st-key-assessment-selection"] div.stButton > button p::after {
+
+    display:
+        block;
+
+    margin-top:
+        4px;
+
+    font-size:
+        12px !important;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.2 !important;
+}
+
+
+[class*="st-key-assessment-guardian"] div.stButton > button p::after {
+
+    content:
+        "우리아이의 모습을 체크해주세요";
+}
+
+
+[class*="st-key-assessment-academic"] div.stButton > button p::after {
+
+    content:
+        "현재 학습상태를 확인합니다.";
 }
 
 
@@ -2498,7 +2568,7 @@ def home_page():
             "GWAGIDAE_CENTER", "JUNGNANG_CENTER",
         )
         with st.container(key="organization-selection"):
-            st.title("사용 소속을 선택해주세요")
+            st.title("소속을 선택해주세요")
             with st.container(key="organization-bureau"):
                 if st.button(bureau["name"], key=f"org_{bureau['code']}", use_container_width=True):
                     st.session_state.selected_organization_code = bureau["code"]
@@ -2518,14 +2588,14 @@ def home_page():
         with st.container(key="assessment-selection"):
             st.title("점검 선택")
             left, right = st.columns(2)
-            if left.button("입학준비 체크리스트", use_container_width=True, key="mode_guardian"):
-                st.session_state.selected_assessment_mode = "guardian_checklist"
-                st.rerun()
-            left.caption("보호자가 평소 생활과 놀이에서 관찰한 모습을 체크합니다.")
-            if right.button("초·중등 학습점검", use_container_width=True, key="mode_academic"):
-                st.session_state.selected_assessment_mode = "academic_test"
-                st.rerun()
-            right.caption("학생이 학년·과목에 맞는 문항을 직접 풉니다.")
+            with left.container(key="assessment-guardian"):
+                if st.button("입학준비 체크리스트", use_container_width=True, key="mode_guardian"):
+                    st.session_state.selected_assessment_mode = "guardian_checklist"
+                    st.rerun()
+            with right.container(key="assessment-academic"):
+                if st.button("초,중등 학습점검", use_container_width=True, key="mode_academic"):
+                    st.session_state.selected_assessment_mode = "academic_test"
+                    st.rerun()
         return
     st.title("대상자 정보")
     name = st.text_input("아이 이름", value=st.session_state.student_name, key="routing_name")
