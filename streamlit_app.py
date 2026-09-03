@@ -910,13 +910,39 @@ div.stButton
 [class*="st-key-organization-grid"] div.stButton > button {
 
     min-height:
-        90px !important;
+        165px !important;
 
     text-align:
         center !important;
 
     font-size:
         16px !important;
+}
+
+
+[class*="st-key-organization-selection"] h1 {
+
+    text-align:
+        center !important;
+
+    margin-top:
+        1.5rem !important;
+
+    margin-bottom:
+        1.5rem !important;
+}
+
+
+[class*="st-key-organization-bureau"] div.stButton > button {
+
+    min-height:
+        170px !important;
+
+    text-align:
+        center !important;
+
+    font-size:
+        18px !important;
 }
 
 
@@ -2217,20 +2243,30 @@ def home_page():
             st.session_state.page = "records"
             st.rerun()
     if not st.session_state.get("selected_organization_code"):
-        st.title("사용 소속을 선택해주세요")
-        with st.container(key="organization_grid"):
-            for row_start in range(0, len(ORGANIZATIONS), 2):
-                row = ORGANIZATIONS[row_start:row_start + 2]
-                if len(row) == 2:
+        organizations_by_code = {organization["code"]: organization for organization in ORGANIZATIONS}
+        bureau = organizations_by_code["JUNGNANG_WOLGYE_BUREAU"]
+        center_codes = (
+            "WOLGYE_CENTER", "GONGNEUNG_CENTER",
+            "MYEONMOK_CENTER", "SINNAE_CENTER",
+            "GWAGIDAE_CENTER", "JUNGNANG_CENTER",
+        )
+        with st.container(key="organization-selection"):
+            st.title("사용 소속을 선택해주세요")
+            with st.container(key="organization-bureau"):
+                if st.button(bureau["name"], key=f"org_{bureau['code']}", use_container_width=True):
+                    st.session_state.selected_organization_code = bureau["code"]
+                    st.session_state.selected_organization_name = bureau["name"]
+                    st.rerun()
+            with st.container(key="organization-grid"):
+                for row_start in range(0, len(center_codes), 2):
                     columns = st.columns(2)
-                else:
-                    columns = st.columns([1, 2, 1])
-                    columns = [columns[1]]
-                for column, organization in zip(columns, row):
-                    if column.button(organization["name"], key=f"org_{organization['code']}", use_container_width=True):
-                        st.session_state.selected_organization_code = organization["code"]
-                        st.session_state.selected_organization_name = organization["name"]
-                        st.rerun()
+                    for column, code in zip(columns, center_codes[row_start:row_start + 2]):
+                        organization = organizations_by_code[code]
+                        label = organization["name"].removesuffix(" 러닝센터")
+                        if column.button(label, key=f"org_{organization['code']}", use_container_width=True):
+                            st.session_state.selected_organization_code = organization["code"]
+                            st.session_state.selected_organization_name = organization["name"]
+                            st.rerun()
         return
     if not st.session_state.get("selected_assessment_mode"):
         st.title("점검을 선택해주세요")
