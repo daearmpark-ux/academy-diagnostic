@@ -10,7 +10,7 @@ from question_registry import get_question_set
 
 
 SUMMARY_FIELDS = [
-    "record_id", "student_key", "created_at", "level", "subject", "test_version",
+    "record_id", "student_key", "created_at", "organization_code", "organization_name", "assessment_mode", "level", "subject", "test_version",
     "core_accuracy", "core_correct", "core_total", "core_pass",
     "total_questions_administered", "total_seconds", "recommended_seconds",
     "time_difference_seconds", "advance_correct", "advance_total", "advance_pass",
@@ -18,7 +18,7 @@ SUMMARY_FIELDS = [
 ]
 
 ITEM_FIELDS = [
-    "record_id", "student_key", "created_at", "level", "subject", "test_version",
+    "record_id", "student_key", "created_at", "organization_code", "organization_name", "assessment_mode", "level", "subject", "test_version",
     "question_id", "question_number", "official_domain", "unit", "skill",
     "is_advance_probe", "score_in_core", "selected_option_number", "selected_answer",
     "correct_option_number", "correct_answer", "is_correct", "is_pass",
@@ -118,7 +118,7 @@ def _item_row(record, number, value, question, context):
         ratio = float(elapsed) / float(recommended)
     return {
         "record_id": record.get("id", ""), "student_key": student_key(record),
-        "created_at": record.get("created_at", ""), "level": record.get("level", ""),
+        "created_at": record.get("created_at", ""), "organization_code": record.get("organization_code", ""), "organization_name": record.get("organization_name", ""), "assessment_mode": record.get("assessment_mode", "academic_test"), "level": record.get("level", ""),
         "subject": record.get("subject", ""), "test_version": test_version,
         "question_id": question.get("id", value.get("question_id", "")),
         "question_number": number, "official_domain": question.get("official_domain", question.get("domain", question.get("area", ""))),
@@ -137,6 +137,19 @@ def _item_row(record, number, value, question, context):
 
 
 def normalize_record_for_export(record):
+    if record.get("assessment_mode") == "guardian_checklist":
+        payload = _json_value(record.get("answers_json"))
+        rows = []
+        for item in payload.get("items", []) if isinstance(payload, dict) else []:
+            rows.append({
+                "record_id": record.get("id", ""), "student_key": student_key(record), "created_at": record.get("created_at", ""),
+                "organization_code": record.get("organization_code", ""), "organization_name": record.get("organization_name", ""), "assessment_mode": "guardian_checklist",
+                "level": record.get("level", ""), "subject": "", "test_version": record.get("test_version", "PRESCHOOL_GUARDIAN_CHECK_2026_v1.0"),
+                "question_id": item.get("item_id", ""), "question_number": "", "official_domain": item.get("domain", ""), "unit": "", "skill": "",
+                "selected_answer": item.get("response", ""), "question_text": item.get("statement", ""), "options_json": json.dumps([], ensure_ascii=False),
+            })
+        summary = {"record_id": record.get("id", ""), "student_key": student_key(record), "created_at": record.get("created_at", ""), "organization_code": record.get("organization_code", ""), "organization_name": record.get("organization_name", ""), "assessment_mode": "guardian_checklist", "level": record.get("level", ""), "subject": "", "test_version": record.get("test_version", "PRESCHOOL_GUARDIAN_CHECK_2026_v1.0"), "areas_json": record.get("areas_json", ""), "total_questions_administered": len(rows)}
+        return summary, rows
     entries, metadata, questions, test_version, core_correct, core_total, advance_correct = _record_context(record)
     item_rows = [_item_row(record, number, value, question, (entries, metadata, questions, test_version, core_correct, core_total, advance_correct)) for (number, value), question in zip(entries, questions)]
     core_pass = sum(row["is_pass"] and row["score_in_core"] for row in item_rows)
@@ -154,7 +167,7 @@ def normalize_record_for_export(record):
         difference = float(total_seconds) - float(recommended_seconds)
     summary = {
         "record_id": record.get("id", ""), "student_key": student_key(record),
-        "created_at": record.get("created_at", ""), "level": record.get("level", ""),
+        "created_at": record.get("created_at", ""), "organization_code": record.get("organization_code", ""), "organization_name": record.get("organization_name", ""), "assessment_mode": record.get("assessment_mode", "academic_test"), "level": record.get("level", ""),
         "subject": record.get("subject", ""), "test_version": test_version,
         "core_accuracy": round(core_correct / core_total * 100) if core_total else record.get("accuracy", ""),
         "core_correct": core_correct, "core_total": core_total, "core_pass": core_pass,

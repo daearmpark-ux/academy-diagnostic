@@ -16,6 +16,9 @@ from diagnostic_engine import (
 from question_registry import get_question_set, get_questions
 from pilot_export import build_export_csvs, export_date
 from result_model import build_saved_result_view_model
+from guardian_model import build_guardian_answers, build_guardian_areas, build_guardian_view_model
+from organization_registry import ORGANIZATIONS, filter_records, get_organization
+from question_registry import get_guardian_checklist
 
 
 # =========================================================
@@ -204,14 +207,16 @@ def db_list():
 
         return []
 
+    organization_code = st.session_state.get("selected_organization_code")
+    if not organization_code:
+        return []
     try:
 
         url = (
             st.secrets["SUPABASE_URL"].rstrip("/")
             +
             "/rest/v1/diagnostic_records"
-            +
-            "?select=*&order=created_at.desc"
+                + f"?select=*&organization_code=eq.{organization_code}&order=created_at.desc"
         )
 
         response = requests.get(
@@ -222,7 +227,8 @@ def db_list():
 
         response.raise_for_status()
 
-        return response.json()
+        organization_code = st.session_state.get("selected_organization_code")
+        return filter_records(response.json(), organization_code)
 
     except Exception:
 
@@ -236,6 +242,9 @@ def db_list_all_for_export(page_size=500):
         return []
 
     records = []
+    organization_code = st.session_state.get("selected_organization_code")
+    if not organization_code:
+        return records
     offset = 0
 
     try:
@@ -245,7 +254,7 @@ def db_list_all_for_export(page_size=500):
             url = (
                 st.secrets["SUPABASE_URL"].rstrip("/")
                 + "/rest/v1/diagnostic_records"
-                + f"?select=*&order=created_at.desc&limit={page_size}&offset={offset}"
+                + f"?select=*&organization_code=eq.{organization_code}&order=created_at.desc&limit={page_size}&offset={offset}"
             )
 
             response = requests.get(
@@ -259,7 +268,8 @@ def db_list_all_for_export(page_size=500):
             if not isinstance(page, list):
                 return records
 
-            records.extend(page)
+            organization_code = st.session_state.get("selected_organization_code")
+            records.extend(filter_records(page, organization_code))
             if len(page) < page_size:
                 return records
 
@@ -324,6 +334,10 @@ DEFAULTS = {
     "records_pin_unlocked": False,
     "records_pin_error": "",
     "records_pin_input": "",
+    "selected_organization_code": None,
+    "selected_organization_name": None,
+    "selected_assessment_mode": None,
+    "guardian_confirmed": False,
 }
 
 for key, value in DEFAULTS.items():
@@ -335,13 +349,35 @@ for key, value in DEFAULTS.items():
 
 def reset_exam():
 
-    for key, value in DEFAULTS.items():
-
-        st.session_state[key] = value
-
+    reset_in_progress()
     st.session_state.page = "home"
 
     st.rerun()
+
+
+def reset_in_progress():
+    for key in ("level", "subject", "student_name", "phone", "question_no", "answers", "times", "question_started_at", "result_saved", "current_record_id", "validation_message", "guardian_confirmed"):
+        st.session_state[key] = DEFAULTS[key]
+
+
+def context_navigation():
+    if not st.session_state.get("selected_organization_code"):
+        return
+    left, right, context = st.columns([1.2, 1.2, 3.6])
+    if left.button("소속 선택하기", key="nav_organization", use_container_width=True):
+        st.session_state.selected_organization_code = None
+        st.session_state.selected_organization_name = None
+        st.session_state.selected_assessment_mode = None
+        reset_in_progress()
+        st.session_state.page = "home"
+        st.rerun()
+    if right.button("점검 선택하기", key="nav_assessment", use_container_width=True):
+        st.session_state.selected_assessment_mode = None
+        reset_in_progress()
+        st.session_state.page = "home"
+        st.rerun()
+    mode_name = "유아 보호자 관찰 체크" if st.session_state.get("selected_assessment_mode") == "guardian_checklist" else "초·중등 학습점검"
+    context.caption(f"현재 소속: {st.session_state.selected_organization_name or '-'} · 현재 점검: {mode_name if st.session_state.get('selected_assessment_mode') else '-'}")
 
 
 def start_timer():
@@ -402,6 +438,12 @@ def save_result_once():
 
     if st.session_state.result_saved:
 
+        return
+
+    organization = get_organization(st.session_state.get("selected_organization_code"))
+    assessment_mode = st.session_state.get("selected_assessment_mode")
+    if not organization or assessment_mode != "academic_test":
+        st.error("소속과 점검 유형을 다시 선택해주세요.")
         return
 
 
@@ -466,6 +508,12 @@ def save_result_once():
 
         "created_at":
             created_at,
+
+        "organization_code": organization["code"],
+
+        "organization_name": organization["name"],
+
+        "assessment_mode": "academic_test",
 
         "student_name":
             st.session_state.student_name,
@@ -1788,7 +1836,7 @@ div.stButton
 # HOME PAGE
 # =========================================================
 
-def home_page():
+def legacy_home_page():
 
     menu_left, menu_right = st.columns(
         [8, 1]
@@ -2146,10 +2194,127 @@ def home_page():
 
 
 # =========================================================
+# ORGANIZATION / MODE HOME
+# =========================================================
+
+def home_page():
+    if st.session_state.get("selected_organization_code"):
+        context_navigation()
+        if st.button("기록 보기", key="home_records", use_container_width=True):
+            st.session_state.page = "records"
+            st.rerun()
+    if not st.session_state.get("selected_organization_code"):
+        st.title("사용 소속을 선택해주세요")
+        for organization in ORGANIZATIONS:
+            if st.button(f"{organization['name']} · {organization['type']}", key=f"org_{organization['code']}", use_container_width=True):
+                st.session_state.selected_organization_code = organization["code"]
+                st.session_state.selected_organization_name = organization["name"]
+                st.rerun()
+        return
+    if not st.session_state.get("selected_assessment_mode"):
+        st.title("점검을 선택해주세요")
+        left, right = st.columns(2)
+        if left.button("유아 보호자 관찰 체크", use_container_width=True, key="mode_guardian"):
+            st.session_state.selected_assessment_mode = "guardian_checklist"
+            st.rerun()
+        left.caption("보호자가 평소 생활과 놀이에서 관찰한 모습을 체크합니다.")
+        if right.button("초·중등 학습점검", use_container_width=True, key="mode_academic"):
+            st.session_state.selected_assessment_mode = "academic_test"
+            st.rerun()
+        right.caption("학생이 학년·과목에 맞는 문항을 직접 풉니다.")
+        return
+    st.title("대상자 정보")
+    name = st.text_input("아이 이름", value=st.session_state.student_name, key="routing_name")
+    phone = st.text_input("보호자 연락처 (선택)", value=st.session_state.phone, key="routing_phone")
+    if st.session_state.selected_assessment_mode == "guardian_checklist":
+        level = st.selectbox("연령", ["5세", "6세", "7세"], key="routing_age")
+        st.info("보호자가 평소 생활과 놀이에서 관찰한 모습을 바탕으로 체크하는 상담 참고자료입니다. 아동이 직접 문제를 풀거나 학업능력을 평가하는 검사가 아닙니다.")
+        confirmed = st.checkbox("이 체크리스트는 보호자가 평소 관찰한 내용을 입력하는 상담 참고자료임을 확인했습니다.", key="routing_confirm")
+        if st.button("관찰 체크 시작하기", type="primary", use_container_width=True, disabled=not confirmed):
+            if not name.strip():
+                st.error("아이 이름을 입력해주세요.")
+                return
+            st.session_state.update(student_name=name.strip(), phone=phone, level=level, subject=None, question_no=1, answers={}, times={}, result_saved=False, page="guardian_test")
+            st.rerun()
+        return
+    level = st.selectbox("학년", ["초1", "초2", "초3", "초4", "초5", "초6", "중1", "중2", "중3"], key="routing_level")
+    subject = st.selectbox("과목", subjects_for(level), key="routing_subject")
+    if st.button("학습점검 시작하기", type="primary", use_container_width=True):
+        if not name.strip():
+            st.error("아이 이름을 입력해주세요.")
+            return
+        st.session_state.update(student_name=name.strip(), phone=phone, level=level, subject=subject, question_no=1, answers={}, times={}, result_saved=False, page="test")
+        st.rerun()
+
+
+def guardian_test_page():
+    checklist = get_guardian_checklist()
+    items = checklist["items"]
+    number = st.session_state.question_no
+    item = items[number - 1]
+    context_navigation()
+    st.title("우리아이 입학준비 관찰 체크")
+    st.caption(f"체크 항목 {number} / {len(items)}")
+    st.subheader(item["domain"])
+    st.write(item["statement"])
+    selected = st.session_state.answers.get(item["item_id"])
+    for value, label in checklist["response_options"].items():
+        if st.button(label, type="primary" if selected == value else "secondary", use_container_width=True, key=f"guardian_{item['item_id']}_{value}"):
+            st.session_state.answers[item["item_id"]] = value
+            st.rerun()
+    previous, next_button = st.columns(2)
+    if number > 1 and previous.button("이전", use_container_width=True):
+        st.session_state.question_no -= 1
+        st.rerun()
+    if next_button.button("체크 완료" if number == len(items) else "다음", type="primary", use_container_width=True):
+        if not selected:
+            st.error("관찰 응답을 선택해주세요.")
+            return
+        if number == len(items):
+            st.session_state.page = "guardian_result"
+        else:
+            st.session_state.question_no += 1
+        st.rerun()
+
+
+def guardian_result_page():
+    payload = build_guardian_answers(st.session_state.answers)
+    record_id = str(uuid.uuid4())
+    if not st.session_state.result_saved:
+        organization = get_organization(st.session_state.selected_organization_code)
+        if not organization:
+            st.error("소속을 다시 선택해주세요.")
+            return
+        record = {"id": record_id, "created_at": datetime.now().isoformat(timespec="seconds"), "student_name": st.session_state.student_name, "phone": st.session_state.phone, "level": st.session_state.level, "subject": None, "organization_code": organization["code"], "organization_name": organization["name"], "assessment_mode": "guardian_checklist", "test_version": "PRESCHOOL_GUARDIAN_CHECK_2026_v1.0", "answers_json": json.dumps(payload, ensure_ascii=False), "areas_json": json.dumps(build_guardian_areas(payload), ensure_ascii=False), "accuracy": None, "correct_count": None, "pass_count": None, "total_questions": None, "total_seconds": None, "recommended_seconds": None}
+        success, error = db_insert(record)
+        if success:
+            st.session_state.result_saved = True
+            st.session_state.current_record_id = record_id
+        elif error:
+            st.warning("현재 Supabase가 연결되지 않아 이 결과는 영구 저장되지 않습니다.")
+    view_model = build_guardian_view_model({"student_name": st.session_state.student_name, "phone": st.session_state.phone, "level": st.session_state.level}, payload)
+    context_navigation()
+    st.title("보호자 관찰 요약")
+    st.caption(f"{view_model['level']} · {view_model['student_name']} · {view_model['created_at'] or '현재'}")
+    labels = {"often": "자주 관찰되는 모습", "sometimes": "상황에 따라 관찰되는 모습", "not_yet_often": "상담에서 함께 살펴볼 모습", "not_observed": "추가로 관찰해볼 모습"}
+    for response, label in labels.items():
+        st.subheader(label)
+        entries = view_model["by_response"][response]
+        st.write("\n".join(f"- {item.get('statement', '')}" for item in entries) if entries else "해당 응답이 없습니다.")
+    st.info("이 결과는 보호자의 관찰 응답을 정리한 상담 참고자료이며, 아동의 학업능력·발달수준·입학 가능 여부 또는 수준별 배정을 판정하는 평가가 아닙니다.")
+    if st.button("처음으로", use_container_width=True, key="guardian_result_home"):
+        reset_in_progress()
+        st.session_state.page = "home"
+        st.rerun()
+
+
+# =========================================================
 # TEST PAGE
 # =========================================================
 
 def test_page():
+
+    context_navigation()
 
     total_questions = len(current_question_set()["questions"])
 
@@ -2959,6 +3124,7 @@ def render_result_report(view_model, mode="live"):
 
 
 def result_page():
+    context_navigation()
     result = build_result_view_model(build_result(), st.session_state.level, st.session_state.subject, st.session_state.student_name, st.session_state.phone, current_question_set().get("test_version", ""))
     save_result_once()
     render_result_report(result)
@@ -2976,7 +3142,7 @@ def records_page():
 
     st.html(
         '<div class="records-title">'
-        '점검 기록'
+        f'{st.session_state.get("selected_organization_name", "현재 소속")} 기록'
         '</div>'
         '<div class="records-sub">'
         '누적된 검사 기록과 연락처를 확인합니다.'
@@ -3562,6 +3728,20 @@ def record_detail_page():
     if not record:
         st.session_state.page = "records"
         st.rerun()
+    if record.get("assessment_mode") == "guardian_checklist":
+        view_model = build_guardian_view_model(record)
+        context_navigation()
+        st.title("보호자 관찰 요약")
+        st.caption(f"소속: {record.get('organization_name', '')} · {view_model['level']} · {view_model['created_at']}")
+        labels = {"often": "자주 관찰되는 모습", "sometimes": "상황에 따라 관찰되는 모습", "not_yet_often": "상담에서 함께 살펴볼 모습", "not_observed": "추가로 관찰해볼 모습"}
+        for response, label in labels.items():
+            st.subheader(label)
+            st.write("\n".join(f"- {item.get('statement', '')}" for item in view_model["by_response"][response]) or "해당 응답이 없습니다.")
+        st.info("이 결과는 보호자의 관찰 응답을 정리한 상담 참고자료이며, 아동의 학업능력·발달수준·입학 가능 여부 또는 수준별 배정을 판정하는 평가가 아닙니다.")
+        if st.button("기록 목록으로", use_container_width=True, key="back_guardian_records"):
+            st.session_state.page = "records"
+            st.rerun()
+        return
     render_result_report(record_result_view_model(record), mode="saved")
 
 
@@ -3579,9 +3759,19 @@ elif st.session_state.page == "test":
     test_page()
 
 
+elif st.session_state.page == "guardian_test":
+
+    guardian_test_page()
+
+
 elif st.session_state.page == "result":
 
     result_page()
+
+
+elif st.session_state.page == "guardian_result":
+
+    guardian_result_page()
 
 
 elif st.session_state.page == "records":

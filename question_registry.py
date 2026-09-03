@@ -5,6 +5,7 @@ from question_bank.placeholder import PLACEHOLDER_QUESTIONS
 from question_bank.preschool.age5 import QUESTION_SET as P5_SET
 from question_bank.preschool.age6 import QUESTION_SET as P6_SET
 from question_bank.preschool.age7 import QUESTION_SET as P7_SET
+from question_bank.preschool.guardian_checklist import QUESTION_SET as GUARDIAN_CHECKLIST
 from question_bank.elementary.grade1_korean import QUESTION_SET as E1_KOR_SET
 from question_bank.elementary.grade1_english import QUESTION_SET as E1_ENG_SET
 from question_bank.elementary.grade1_math import QUESTION_SET as E1_MATH_SET
@@ -113,3 +114,12 @@ def get_questions(level, subject=None):
     if question_set is not None:
         return question_set["questions"]
     return PLACEHOLDER_QUESTIONS
+
+
+def get_guardian_checklist():
+    """Return the shared scoreless preschool checklist."""
+    return {
+        **GUARDIAN_CHECKLIST,
+        "items": [dict(item) for item in GUARDIAN_CHECKLIST["items"]],
+        "response_options": dict(GUARDIAN_CHECKLIST["response_options"]),
+    }

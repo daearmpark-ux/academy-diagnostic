@@ -3,6 +3,8 @@
 from diagnostic_engine import calculate_result, time_difference_text
 from question_registry import QUESTION_SETS, get_question_set, get_questions
 from question_bank.middle.grade2_math import M2_MATH_ANSWER_KEY
+from organization_registry import ORGANIZATIONS, filter_records, validate_organizations
+from question_bank.preschool.guardian_checklist import ITEMS, RESPONSE_OPTIONS, TEST_VERSION
 
 EXPECTED = {
     ("5세", "입학준비"), ("6세", "입학준비"), ("7세", "입학준비"),
@@ -100,12 +102,33 @@ def audit_metadata_and_regressions():
     assert time_difference_text(80, 80) == "권장시간과 동일"
 
 
+def audit_guardian_and_organizations():
+    assert validate_organizations()
+    assert len(ORGANIZATIONS) == 7
+    assert len(ITEMS) == 15
+    assert [item["item_id"] for item in ITEMS] == [f"GC-{index:02d}" for index in range(1, 16)]
+    assert len({item["domain"] for item in ITEMS}) == 5
+    assert all(sum(item["domain"] == domain for item in ITEMS) == 3 for domain in {item["domain"] for item in ITEMS})
+    assert set(RESPONSE_OPTIONS) == {"often", "sometimes", "not_yet_often", "not_observed"}
+    assert TEST_VERSION == "PRESCHOOL_GUARDIAN_CHECK_2026_v1.0"
+    assert not any("answer" in item or "recommended_seconds" in item for item in ITEMS)
+    records = [
+        {"organization_code": "GWAGIDAE_CENTER", "assessment_mode": "academic_test"},
+        {"organization_code": "GWAGIDAE_CENTER", "assessment_mode": "guardian_checklist"},
+        {"organization_code": "GONGNEUNG_CENTER", "assessment_mode": "academic_test"},
+        {"organization_code": None, "assessment_mode": None},
+    ]
+    assert len(filter_records(records, "GWAGIDAE_CENTER")) == 2
+    assert len(filter_records(records, "GONGNEUNG_CENTER")) == 1
+
+
 def run():
     for _ in range(20):
         audit_sets()
         audit_scoring()
         audit_metadata_and_regressions()
-    print("FULL_AUDIT_PASS: 23 sets / 345 questions / 20 cycles / 6 scoring cases")
+        audit_guardian_and_organizations()
+    print("FULL_AUDIT_PASS: 23 sets / 345 questions / guardian / organizations / 20 cycles")
 
 
 if __name__ == "__main__":
