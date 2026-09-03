@@ -910,13 +910,13 @@ div.stButton
 [class*="st-key-organization-grid"] div.stButton > button {
 
     min-height:
-        165px !important;
+        85px !important;
 
     text-align:
         center !important;
 
     font-size:
-        16px !important;
+        28px !important;
 }
 
 
@@ -936,13 +936,13 @@ div.stButton
 [class*="st-key-organization-bureau"] div.stButton > button {
 
     min-height:
-        170px !important;
+        90px !important;
 
     text-align:
         center !important;
 
     font-size:
-        18px !important;
+        30px !important;
 }
 
 
@@ -2262,8 +2262,7 @@ def home_page():
                     columns = st.columns(2)
                     for column, code in zip(columns, center_codes[row_start:row_start + 2]):
                         organization = organizations_by_code[code]
-                        label = organization["name"].removesuffix(" 러닝센터")
-                        if column.button(label, key=f"org_{organization['code']}", use_container_width=True):
+                        if column.button(organization["name"], key=f"org_{organization['code']}", use_container_width=True):
                             st.session_state.selected_organization_code = organization["code"]
                             st.session_state.selected_organization_name = organization["name"]
                             st.rerun()
