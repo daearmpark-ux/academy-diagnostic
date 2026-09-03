@@ -368,31 +368,45 @@ def context_navigation():
         else "초·중등" if st.session_state.get("selected_assessment_mode") == "academic_test"
         else "-"
     )
+    organization_name = st.session_state.selected_organization_name or "-"
+    st.html(f"""
+        <style>
+        [class*="st-key-nav-organization"] div.stButton > button::after {{
+            content: {json.dumps(f"(현재: {organization_name})", ensure_ascii=False)};
+            display: block;
+            font-size: 12px !important;
+            font-weight: 700;
+            line-height: 1.2;
+        }}
+        [class*="st-key-nav-assessment"] div.stButton > button::after {{
+            content: {json.dumps(f"(현재: {mode_name})", ensure_ascii=False)};
+            display: block;
+            font-size: 12px !important;
+            font-weight: 700;
+            line-height: 1.2;
+        }}
+        </style>
+    """)
     with st.container(key="organization-navigation"):
         organization_column, assessment_column, records_column = st.columns([4, 3.5, 2])
-        if organization_column.button(
-            f"소속 선택하기 (현재: {st.session_state.selected_organization_name or '-'})",
-            key="nav_organization",
-            use_container_width=True,
-        ):
-            st.session_state.selected_organization_code = None
-            st.session_state.selected_organization_name = None
-            st.session_state.selected_assessment_mode = None
-            reset_in_progress()
-            st.session_state.page = "home"
-            st.rerun()
-        if assessment_column.button(
-            f"점검 선택하기 (현재: {mode_name})",
-            key="nav_assessment",
-            use_container_width=True,
-        ):
-            st.session_state.selected_assessment_mode = None
-            reset_in_progress()
-            st.session_state.page = "home"
-            st.rerun()
-        if records_column.button("기록 보기", key="nav_records", use_container_width=True):
-            st.session_state.page = "records"
-            st.rerun()
+        with organization_column.container(key="nav-organization"):
+            if st.button("소속 선택하기", key="nav_organization", use_container_width=True):
+                st.session_state.selected_organization_code = None
+                st.session_state.selected_organization_name = None
+                st.session_state.selected_assessment_mode = None
+                reset_in_progress()
+                st.session_state.page = "home"
+                st.rerun()
+        with assessment_column.container(key="nav-assessment"):
+            if st.button("점검 선택하기", key="nav_assessment", use_container_width=True):
+                st.session_state.selected_assessment_mode = None
+                reset_in_progress()
+                st.session_state.page = "home"
+                st.rerun()
+        with records_column.container(key="nav-records"):
+            if st.button("기록 보기", key="nav_records", use_container_width=True):
+                st.session_state.page = "records"
+                st.rerun()
 
 
 def start_timer():
@@ -940,7 +954,7 @@ div.stButton
         .25rem !important;
 
     font-size:
-        36px !important;
+        28px !important;
 }
 
 
@@ -975,7 +989,7 @@ div.stButton
         .25rem !important;
 
     font-size:
-        36px !important;
+        28px !important;
 }
 
 
@@ -1000,7 +1014,30 @@ div.stButton
         .3rem !important;
 
     font-size:
-        24px !important;
+        28px !important;
+}
+
+
+[class*="st-key-organization-navigation"] div.stButton > button {
+
+    flex-direction:
+        column !important;
+
+    justify-content:
+        center !important;
+
+    align-items:
+        center !important;
+
+    gap:
+        2px !important;
+}
+
+
+[class*="st-key-organization-navigation"] div.stButton > button p {
+
+    margin:
+        0 !important;
 }
 
 
