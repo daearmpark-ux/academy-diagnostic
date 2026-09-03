@@ -925,7 +925,7 @@ div.stButton
         .25rem !important;
 
     font-size:
-        48px !important;
+        36px !important;
 }
 
 
@@ -960,7 +960,7 @@ div.stButton
         .25rem !important;
 
     font-size:
-        48px !important;
+        36px !important;
 }
 
 
