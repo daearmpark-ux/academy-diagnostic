@@ -363,21 +363,36 @@ def reset_in_progress():
 def context_navigation():
     if not st.session_state.get("selected_organization_code"):
         return
-    left, right, context = st.columns([1.2, 1.2, 3.6])
-    if left.button("소속 선택하기", key="nav_organization", use_container_width=True):
-        st.session_state.selected_organization_code = None
-        st.session_state.selected_organization_name = None
-        st.session_state.selected_assessment_mode = None
-        reset_in_progress()
-        st.session_state.page = "home"
-        st.rerun()
-    if right.button("점검 선택하기", key="nav_assessment", use_container_width=True):
-        st.session_state.selected_assessment_mode = None
-        reset_in_progress()
-        st.session_state.page = "home"
-        st.rerun()
-    mode_name = "유아 보호자 관찰 체크" if st.session_state.get("selected_assessment_mode") == "guardian_checklist" else "초·중등 학습점검"
-    context.caption(f"현재 소속: {st.session_state.selected_organization_name or '-'} · 현재 점검: {mode_name if st.session_state.get('selected_assessment_mode') else '-'}")
+    mode_name = (
+        "유아" if st.session_state.get("selected_assessment_mode") == "guardian_checklist"
+        else "초·중등" if st.session_state.get("selected_assessment_mode") == "academic_test"
+        else "-"
+    )
+    with st.container(key="organization-navigation"):
+        organization_column, assessment_column, records_column = st.columns([4, 3.5, 2])
+        if organization_column.button(
+            f"소속 선택하기 (현재: {st.session_state.selected_organization_name or '-'})",
+            key="nav_organization",
+            use_container_width=True,
+        ):
+            st.session_state.selected_organization_code = None
+            st.session_state.selected_organization_name = None
+            st.session_state.selected_assessment_mode = None
+            reset_in_progress()
+            st.session_state.page = "home"
+            st.rerun()
+        if assessment_column.button(
+            f"점검 선택하기 (현재: {mode_name})",
+            key="nav_assessment",
+            use_container_width=True,
+        ):
+            st.session_state.selected_assessment_mode = None
+            reset_in_progress()
+            st.session_state.page = "home"
+            st.rerun()
+        if records_column.button("기록 보기", key="nav_records", use_container_width=True):
+            st.session_state.page = "records"
+            st.rerun()
 
 
 def start_timer():
@@ -961,6 +976,79 @@ div.stButton
 
     font-size:
         36px !important;
+}
+
+
+[class*="st-key-organization-navigation"] div.stButton > button,
+[class*="st-key-organization-navigation"] div.stButton > button p,
+[class*="st-key-organization-navigation"] div.stButton > button span {
+
+    min-height:
+        48px !important;
+
+    text-align:
+        center !important;
+
+    white-space:
+        normal !important;
+
+    line-height:
+        1.25 !important;
+
+    padding:
+        .25rem
+        .3rem !important;
+
+    font-size:
+        24px !important;
+}
+
+
+[class*="st-key-assessment-selection"] h1 {
+
+    text-align:
+        center !important;
+
+    margin-top:
+        1.5rem !important;
+
+    margin-bottom:
+        1.25rem !important;
+}
+
+
+[class*="st-key-assessment-selection"] div.stButton > button,
+[class*="st-key-assessment-selection"] div.stButton > button p,
+[class*="st-key-assessment-selection"] div.stButton > button span {
+
+    min-height:
+        90px !important;
+
+    text-align:
+        center !important;
+
+    white-space:
+        normal !important;
+
+    line-height:
+        1.3 !important;
+
+    padding:
+        .4rem
+        .3rem !important;
+
+    font-size:
+        24px !important;
+}
+
+
+[class*="st-key-assessment-selection"] [data-testid="stCaptionContainer"] {
+
+    text-align:
+        center !important;
+
+    font-size:
+        14px !important;
 }
 
 
@@ -2257,9 +2345,6 @@ def legacy_home_page():
 def home_page():
     if st.session_state.get("selected_organization_code"):
         context_navigation()
-        if st.button("기록 보기", key="home_records", use_container_width=True):
-            st.session_state.page = "records"
-            st.rerun()
     if not st.session_state.get("selected_organization_code"):
         organizations_by_code = {organization["code"]: organization for organization in ORGANIZATIONS}
         bureau = organizations_by_code["JUNGNANG_WOLGYE_BUREAU"]
@@ -2286,16 +2371,17 @@ def home_page():
                             st.rerun()
         return
     if not st.session_state.get("selected_assessment_mode"):
-        st.title("점검을 선택해주세요")
-        left, right = st.columns(2)
-        if left.button("유아 보호자 관찰 체크", use_container_width=True, key="mode_guardian"):
-            st.session_state.selected_assessment_mode = "guardian_checklist"
-            st.rerun()
-        left.caption("보호자가 평소 생활과 놀이에서 관찰한 모습을 체크합니다.")
-        if right.button("초·중등 학습점검", use_container_width=True, key="mode_academic"):
-            st.session_state.selected_assessment_mode = "academic_test"
-            st.rerun()
-        right.caption("학생이 학년·과목에 맞는 문항을 직접 풉니다.")
+        with st.container(key="assessment-selection"):
+            st.title("점검 선택")
+            left, right = st.columns(2)
+            if left.button("입학준비 체크리스트", use_container_width=True, key="mode_guardian"):
+                st.session_state.selected_assessment_mode = "guardian_checklist"
+                st.rerun()
+            left.caption("보호자가 평소 생활과 놀이에서 관찰한 모습을 체크합니다.")
+            if right.button("초·중등 학습점검", use_container_width=True, key="mode_academic"):
+                st.session_state.selected_assessment_mode = "academic_test"
+                st.rerun()
+            right.caption("학생이 학년·과목에 맞는 문항을 직접 풉니다.")
         return
     st.title("대상자 정보")
     name = st.text_input("아이 이름", value=st.session_state.student_name, key="routing_name")
