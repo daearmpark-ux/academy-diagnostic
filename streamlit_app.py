@@ -907,7 +907,9 @@ div.stButton
 }
 
 
-[class*="st-key-organization-grid"] div.stButton > button {
+[class*="st-key-organization-grid"] div.stButton > button,
+[class*="st-key-organization-grid"] div.stButton > button p,
+[class*="st-key-organization-grid"] div.stButton > button span {
 
     min-height:
         85px !important;
@@ -940,7 +942,9 @@ div.stButton
 }
 
 
-[class*="st-key-organization-bureau"] div.stButton > button {
+[class*="st-key-organization-bureau"] div.stButton > button,
+[class*="st-key-organization-bureau"] div.stButton > button p,
+[class*="st-key-organization-bureau"] div.stButton > button span {
 
     min-height:
         90px !important;
