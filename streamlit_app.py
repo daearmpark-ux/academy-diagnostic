@@ -19,7 +19,13 @@ from result_model import build_saved_result_view_model
 from guardian_model import build_guardian_answers, build_guardian_areas, build_guardian_view_model
 from organization_registry import ORGANIZATIONS, filter_records, get_organization
 from question_registry import get_guardian_checklist
-from ui.styles import inject_navigation_styles, inject_styles
+from ui.components import (
+    render_context_navigation,
+    render_page_title,
+    render_selection_card,
+    render_section_title,
+)
+from ui.styles import inject_styles
 
 
 # =========================================================
@@ -370,27 +376,22 @@ def context_navigation():
         else "-"
     )
     organization_name = st.session_state.selected_organization_name or "-"
-    inject_navigation_styles(organization_name, mode_name)
-    with st.container(key="organization-navigation"):
-        organization_column, assessment_column, records_column = st.columns(3, gap="medium")
-        with organization_column.container(key="nav-organization"):
-            if st.button("소속변경", key="nav_organization", use_container_width=True):
-                st.session_state.selected_organization_code = None
-                st.session_state.selected_organization_name = None
-                st.session_state.selected_assessment_mode = None
-                reset_in_progress()
-                st.session_state.page = "home"
-                st.rerun()
-        with assessment_column.container(key="nav-assessment"):
-            if st.button("점검변경", key="nav_assessment", use_container_width=True):
-                st.session_state.selected_assessment_mode = None
-                reset_in_progress()
-                st.session_state.page = "home"
-                st.rerun()
-        with records_column.container(key="nav-records"):
-            if st.button("기록보기", key="nav_records", use_container_width=True):
-                st.session_state.page = "records"
-                st.rerun()
+    action = render_context_navigation(organization_name, mode_name)
+    if action == "organization":
+        st.session_state.selected_organization_code = None
+        st.session_state.selected_organization_name = None
+        st.session_state.selected_assessment_mode = None
+        reset_in_progress()
+        st.session_state.page = "home"
+        st.rerun()
+    if action == "assessment":
+        st.session_state.selected_assessment_mode = None
+        reset_in_progress()
+        st.session_state.page = "home"
+        st.rerun()
+    if action == "records":
+        st.session_state.page = "records"
+        st.rerun()
 
 
 def start_timer():
@@ -976,7 +977,7 @@ def home_page():
             "GWAGIDAE_CENTER", "JUNGNANG_CENTER",
         )
         with st.container(key="organization-selection"):
-            st.title("소속을 선택해주세요")
+            render_page_title("소속을 선택해주세요")
             with st.container(key="organization-bureau"):
                 if st.button(bureau["name"], key=f"org_{bureau['code']}", use_container_width=True):
                     st.session_state.selected_organization_code = bureau["code"]
@@ -994,18 +995,28 @@ def home_page():
         return
     if not st.session_state.get("selected_assessment_mode"):
         with st.container(key="assessment-selection"):
-            st.title("점검 선택")
+            render_page_title("점검 선택")
             left, right = st.columns(2)
-            with left.container(key="assessment-guardian"):
-                if st.button("입학준비 체크리스트", use_container_width=True, key="mode_guardian"):
+            with left:
+                if render_selection_card(
+                    "입학준비 체크리스트",
+                    "assessment-guardian",
+                    use_container_width=True,
+                    key="mode_guardian",
+                ):
                     st.session_state.selected_assessment_mode = "guardian_checklist"
                     st.rerun()
-            with right.container(key="assessment-academic"):
-                if st.button("초,중등 학습점검", use_container_width=True, key="mode_academic"):
+            with right:
+                if render_selection_card(
+                    "초,중등 학습점검",
+                    "assessment-academic",
+                    use_container_width=True,
+                    key="mode_academic",
+                ):
                     st.session_state.selected_assessment_mode = "academic_test"
                     st.rerun()
         return
-    st.title("대상자 정보")
+    render_page_title("대상자 정보")
     name = st.text_input("아이 이름", value=st.session_state.student_name, key="routing_name")
     phone = st.text_input("보호자 연락처 (선택)", value=st.session_state.phone, key="routing_phone")
     if st.session_state.selected_assessment_mode == "guardian_checklist":
@@ -1035,9 +1046,9 @@ def guardian_test_page():
     number = st.session_state.question_no
     item = items[number - 1]
     context_navigation()
-    st.title("우리아이 입학준비 관찰 체크")
+    render_page_title("우리아이 입학준비 관찰 체크")
     st.caption(f"체크 항목 {number} / {len(items)}")
-    st.subheader(item["domain"])
+    render_section_title(item["domain"])
     st.write(item["statement"])
     selected = st.session_state.answers.get(item["item_id"])
     for value, label in checklist["response_options"].items():
@@ -1076,11 +1087,11 @@ def guardian_result_page():
             st.warning("현재 Supabase가 연결되지 않아 이 결과는 영구 저장되지 않습니다.")
     view_model = build_guardian_view_model({"student_name": st.session_state.student_name, "phone": st.session_state.phone, "level": st.session_state.level}, payload)
     context_navigation()
-    st.title("보호자 관찰 요약")
+    render_page_title("보호자 관찰 요약")
     st.caption(f"{view_model['level']} · {view_model['student_name']} · {view_model['created_at'] or '현재'}")
     labels = {"often": "자주 관찰되는 모습", "sometimes": "상황에 따라 관찰되는 모습", "not_yet_often": "상담에서 함께 살펴볼 모습", "not_observed": "추가로 관찰해볼 모습"}
     for response, label in labels.items():
-        st.subheader(label)
+        render_section_title(label)
         entries = view_model["by_response"][response]
         st.write("\n".join(f"- {item.get('statement', '')}" for item in entries) if entries else "해당 응답이 없습니다.")
     st.info("이 결과는 보호자의 관찰 응답을 정리한 상담 참고자료이며, 아동의 학업능력·발달수준·입학 가능 여부 또는 수준별 배정을 판정하는 평가가 아닙니다.")
@@ -2513,11 +2524,11 @@ def record_detail_page():
     if record.get("assessment_mode") == "guardian_checklist":
         view_model = build_guardian_view_model(record)
         context_navigation()
-        st.title("보호자 관찰 요약")
+        render_page_title("보호자 관찰 요약")
         st.caption(f"소속: {record.get('organization_name', '')} · {view_model['level']} · {view_model['created_at']}")
         labels = {"often": "자주 관찰되는 모습", "sometimes": "상황에 따라 관찰되는 모습", "not_yet_often": "상담에서 함께 살펴볼 모습", "not_observed": "추가로 관찰해볼 모습"}
         for response, label in labels.items():
-            st.subheader(label)
+            render_section_title(label)
             st.write("\n".join(f"- {item.get('statement', '')}" for item in view_model["by_response"][response]) or "해당 응답이 없습니다.")
         st.info("이 결과는 보호자의 관찰 응답을 정리한 상담 참고자료이며, 아동의 학업능력·발달수준·입학 가능 여부 또는 수준별 배정을 판정하는 평가가 아닙니다.")
         if st.button("기록 목록으로", use_container_width=True, key="back_guardian_records"):
