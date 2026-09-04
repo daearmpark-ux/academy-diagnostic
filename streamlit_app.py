@@ -849,50 +849,8 @@ div[data-testid="stButton"] button,
 button[kind="primary"],
 button[kind="secondary"] {
 
-    display: grid !important;
-
-    place-items:
-        center !important;
-
-    text-align:
-        center !important;
-
     box-sizing:
         border-box !important;
-
-    min-height:
-        45px !important;
-
-    border-radius:
-        11px !important;
-
-    font-size:
-        14px !important;
-
-    font-weight:
-        900 !important;
-
-    padding:
-        .45rem
-        .6rem !important;
-
-    white-space:
-        normal !important;
-
-    height:
-        auto !important;
-}
-
-
-div[data-testid="stButton"] > button > div,
-div[data-testid="stButton"] > button [data-testid="stMarkdownContainer"],
-.stButton > button > div,
-.stButton > button [data-testid="stMarkdownContainer"] {
-
-    width:
-        100% !important;
-
-    height:
         100% !important;
 
     display:
@@ -1127,33 +1085,6 @@ div.stButton > button[kind="primary"] * {
 
     line-height:
         1.15 !important;
-}
-
-
-[class*="st-key-organization-navigation"] div.stButton > button > div,
-[class*="st-key-assessment-selection"] div.stButton > button > div {
-
-    gap:
-        4px !important;
-}
-
-
-[class*="st-key-assessment-selection"] div.stButton > button p {
-
-    display:
-        flex !important;
-
-    flex-direction:
-        column !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    gap:
-        4px !important;
 }
 
 
@@ -2119,6 +2050,110 @@ div.stButton > button[kind="primary"] * {
         grid-template-columns:
             1fr;
     }
+}
+
+
+/* FINAL BUTTON ALIGNMENT OVERRIDE */
+
+div[data-testid="stButton"] > button,
+div.stButton > button,
+button[kind="primary"],
+button[kind="secondary"] {
+
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    text-align:
+        center !important;
+
+    padding-top:
+        0 !important;
+
+    padding-bottom:
+        0 !important;
+}
+
+
+div[data-testid="stButton"] > button > div,
+div.stButton > button > div,
+div[data-testid="stButton"] > button [data-testid="stMarkdownContainer"],
+div.stButton > button [data-testid="stMarkdownContainer"] {
+
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    text-align:
+        center !important;
+
+    width:
+        100% !important;
+
+    height:
+        auto !important;
+
+    min-height:
+        0 !important;
+
+    flex:
+        0 0 auto !important;
+
+    gap:
+        4px !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+}
+
+
+div[data-testid="stButton"] > button p,
+div[data-testid="stButton"] > button span,
+div.stButton > button p,
+div.stButton > button span {
+
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    text-align:
+        center !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    line-height:
+        1.15 !important;
 }
 
 </style>
