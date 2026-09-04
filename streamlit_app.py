@@ -36,6 +36,11 @@ from ui.pages.guardian import (
     render_guardian_result_page,
 )
 from ui.pages.organization import render_organization_page
+from ui.pages.records import (
+    render_records_header,
+    render_records_list_page,
+    render_records_pin_page,
+)
 from ui.pages.results import render_result_report
 from ui.styles import inject_styles
 
@@ -1637,308 +1642,78 @@ def result_page():
 # =========================================================
 
 def records_page():
-
-    st.html(
-        '<div class="records-title">'
-        f'{st.session_state.get("selected_organization_name", "현재 소속")} 기록'
-        '</div>'
-        '<div class="records-sub">'
-        '누적된 검사 기록과 연락처를 확인합니다.'
-        '</div>'
-    )
+    render_records_header(st.session_state.get("selected_organization_name", "현재 소속"))
 
     if not st.session_state.records_pin_unlocked:
-
-        st.info("기록 보기는 관리자 PIN 입력 후 열람할 수 있습니다.")
-
-        if admin_records_pin() is None:
-
-            st.warning(
-                "관리자 PIN이 설정되지 않았습니다. "
-                "secrets.toml에 ADMIN_RECORDS_PIN을 추가하세요."
-            )
-
-            return
-
-        st.text_input(
-            "관리자 PIN",
-            type="password",
-            key="records_pin_input",
+        action = render_records_pin_page(
+            admin_records_pin() is not None,
+            st.session_state.records_pin_error,
         )
-
-        if st.button(
-            "기록 보기 열기",
-            type="primary",
-            use_container_width=True,
-            key="records_pin_submit",
-        ):
-
+        if action == "unlock":
             unlocked, pin_error = validate_records_pin(
                 st.session_state.records_pin_input,
                 admin_records_pin(),
             )
-
             if unlocked:
-
                 st.session_state.records_pin_unlocked = True
                 st.session_state.records_pin_error = ""
                 st.rerun()
-
-            else:
-
-                st.session_state.records_pin_error = pin_error
-
-        if st.session_state.records_pin_error:
-
-            st.error(st.session_state.records_pin_error)
-
+            st.session_state.records_pin_error = pin_error
+            st.error(pin_error)
         return
 
-    lock_col, _ = st.columns([1, 3])
+    if not supabase_ready():
+        st.warning(
+            "영구 기록을 사용하려면 "
+            "Supabase 연결이 필요합니다."
+        )
+        records = []
+        attempts_csv = None
+        items_csv = None
+        export_day = None
+    else:
+        records = db_list()
+        export_records = db_list_all_for_export()
+        attempts_csv, items_csv = build_export_csvs(export_records) if export_records else (None, None)
+        export_day = export_date() if export_records else None
 
-    if lock_col.button(
-        "다시 잠그기",
-        use_container_width=True,
-        key="records_pin_lock",
-    ):
-
+    action = render_records_list_page(
+        records,
+        st.session_state.get("selected_organization_name", "현재 소속"),
+        supabase_ready(),
+        attempts_csv,
+        items_csv,
+        export_day,
+        mmss,
+        st.session_state.delete_confirm_id,
+    )
+    if not action:
+        return
+    action_type = action["type"]
+    if action_type == "lock":
         st.session_state.records_pin_unlocked = False
         st.session_state.records_pin_error = ""
         st.session_state.pop("records_pin_input", None)
         st.session_state.view_record = None
         st.session_state.delete_confirm_id = None
         st.rerun()
-
-
-    if not supabase_ready():
-
-        st.warning(
-            "영구 기록을 사용하려면 "
-            "Supabase 연결이 필요합니다."
-        )
-
-        records = []
-
-
-    else:
-
-        records = db_list()
-
-
-    if supabase_ready():
-
-        st.html(
-            '<div class="result-card">'
-            '<div class="card-title">파일럿 데이터 내보내기</div>'
-            '<div class="helper">학생 개인정보를 제외한 분석용 데이터를 CSV로 내보냅니다.</div>'
-            '</div>'
-        )
-
-        export_records = db_list_all_for_export()
-
-        if not export_records:
-
-            st.info("내보낼 기록이 없습니다.")
-
-        else:
-
-            attempts_csv, items_csv = build_export_csvs(export_records)
-            today = export_date()
-            download_col, item_col = st.columns(2)
-
-            download_col.download_button(
-                "파일럿 요약 CSV 내려받기",
-                data=attempts_csv,
-                file_name=f"academy_pilot_attempts_{today}.csv",
-                mime="text/csv",
-                key="pilot_attempts_csv_download",
-                use_container_width=True,
-            )
-            item_col.download_button(
-                "문항별 분석 CSV 내려받기",
-                data=items_csv,
-                file_name=f"academy_pilot_items_{today}.csv",
-                mime="text/csv",
-                key="pilot_items_csv_download",
-                use_container_width=True,
-            )
-
-
-    if not records:
-
-        st.info(
-            "저장된 점검 기록이 없습니다."
-        )
-
-
-    for record in records:
-
-        record_id = record.get("id")
-
-
-        phone = (
-            record.get("phone")
-            or
-            "연락처 미입력"
-        )
-
-
-        st.html(
-            f"""
-            <div class="record-card">
-
-                <div class="record-top">
-
-                    <div>
-
-                        <div class="record-name">
-
-                            {record.get("student_name","")}
-                            ·
-                            {record.get("level","")}
-                            ·
-                            {record.get("subject","")}
-
-                        </div>
-
-                        <div class="record-meta">
-
-                            {record.get("created_at","")}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="record-phone">
-
-                        {phone}
-
-                    </div>
-
-                </div>
-
-
-                <div class="record-score">
-
-                    정확도
-                    {record.get("accuracy",0)}%
-
-                    ·
-
-                    미풀이
-                    {record.get("pass_count",0)}개
-
-                    ·
-
-                    총 풀이시간
-                    {mmss(record.get("total_seconds",0))}
-
-                </div>
-
-            </div>
-            """
-        )
-
-
-        action1, action2 = st.columns(
-            [3, 1]
-        )
-
-
-        if action1.button(
-            "결과 보기",
-            use_container_width=True,
-            key=f"view_{record_id}",
-        ):
-
-            st.session_state.view_record = (
-                record
-            )
-
-            st.session_state.page = (
-                "record_detail"
-            )
-
+    if action_type == "view":
+        st.session_state.view_record = action["record"]
+        st.session_state.page = "record_detail"
+        st.rerun()
+    if action_type == "delete":
+        st.session_state.delete_confirm_id = action["record_id"]
+        st.rerun()
+    if action_type == "cancel_delete":
+        st.session_state.delete_confirm_id = None
+        st.rerun()
+    if action_type == "confirm_delete":
+        if db_delete(action["record_id"]):
+            st.session_state.delete_confirm_id = None
             st.rerun()
-
-
-        if action2.button(
-            "×",
-            use_container_width=True,
-            key=f"delete_{record_id}",
-        ):
-
-            st.session_state.delete_confirm_id = (
-                record_id
-            )
-
-            st.rerun()
-
-
-        if (
-            st.session_state.delete_confirm_id
-            ==
-            record_id
-        ):
-
-            st.html(
-                '<div class="delete-note">'
-                '이 기록을 삭제할까요?'
-                '</div>'
-            )
-
-
-            cancel_col, delete_col = (
-                st.columns(2)
-            )
-
-
-            if cancel_col.button(
-                "취소",
-                use_container_width=True,
-                key=f"cancel_delete_{record_id}",
-            ):
-
-                st.session_state.delete_confirm_id = (
-                    None
-                )
-
-                st.rerun()
-
-
-            if delete_col.button(
-                "삭제",
-                type="primary",
-                use_container_width=True,
-                key=f"confirm_delete_{record_id}",
-            ):
-
-                if db_delete(record_id):
-
-                    st.session_state.delete_confirm_id = (
-                        None
-                    )
-
-                    st.rerun()
-
-                else:
-
-                    st.error(
-                        "삭제하지 못했습니다."
-                    )
-
-
-    if st.button(
-        "메인으로 돌아가기",
-        use_container_width=True,
-        key="records_home",
-    ):
-
-        st.session_state.page = (
-            "home"
-        )
-
+        st.error("삭제하지 못했습니다.")
+    if action_type == "home":
+        st.session_state.page = "home"
         st.rerun()
 
 
