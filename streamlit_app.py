@@ -844,7 +844,25 @@ input::placeholder {
 
 /* BUTTON */
 
-div.stButton > button {
+div[data-testid="stButton"] button,
+.stButton > button,
+button[kind="primary"],
+button[kind="secondary"] {
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    text-align:
+        center !important;
+
+    box-sizing:
+        border-box !important;
 
     min-height:
         45px !important;
@@ -870,8 +888,29 @@ div.stButton > button {
 }
 
 
-div.stButton
-> button[kind="secondary"] {
+div[data-testid="stButton"] button > div,
+div[data-testid="stButton"] button p,
+div[data-testid="stButton"] button span,
+.stButton > button > div,
+.stButton > button p,
+.stButton > button span {
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    text-align:
+        center !important;
+
+    line-height:
+        1.2 !important;
+}
+
+
+div[data-testid="stButton"] button[kind="secondary"],
+div.stButton > button[kind="secondary"] {
 
     background:
         #FFFFFF !important;
@@ -885,8 +924,8 @@ div.stButton
 }
 
 
-div.stButton
-> button[kind="secondary"] * {
+div[data-testid="stButton"] button[kind="secondary"] *,
+div.stButton > button[kind="secondary"] * {
 
     color:
         #17324D !important;
@@ -896,8 +935,8 @@ div.stButton
 }
 
 
-div.stButton
-> button[kind="primary"] {
+div[data-testid="stButton"] button[kind="primary"],
+div.stButton > button[kind="primary"] {
 
     background:
         #246FE5 !important;
@@ -911,8 +950,8 @@ div.stButton
 }
 
 
-div.stButton
-> button[kind="primary"] * {
+div[data-testid="stButton"] button[kind="primary"] *,
+div.stButton > button[kind="primary"] * {
 
     color:
         #FFFFFF !important;
@@ -958,34 +997,6 @@ div.stButton
 }
 
 
-[class*="st-key-organization-grid"] div.stButton > button {
-
-    display:
-        flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    line-height:
-        1.2 !important;
-}
-
-
-[class*="st-key-organization-grid"] div.stButton > button > div,
-[class*="st-key-organization-grid"] div.stButton > button p,
-[class*="st-key-organization-grid"] div.stButton > button span {
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-}
-
-
 [class*="st-key-organization-selection"] h1 {
 
     text-align:
@@ -1021,34 +1032,6 @@ div.stButton
 }
 
 
-[class*="st-key-organization-bureau"] div.stButton > button {
-
-    display:
-        flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    line-height:
-        1.2 !important;
-}
-
-
-[class*="st-key-organization-bureau"] div.stButton > button > div,
-[class*="st-key-organization-bureau"] div.stButton > button p,
-[class*="st-key-organization-bureau"] div.stButton > button span {
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-}
-
-
 [class*="st-key-organization-navigation"] div.stButton > button,
 [class*="st-key-organization-navigation"] div.stButton > button p,
 [class*="st-key-organization-navigation"] div.stButton > button span {
@@ -1061,9 +1044,6 @@ div.stButton
 
     white-space:
         normal !important;
-
-    line-height:
-        1.25 !important;
 
     padding:
         .25rem
@@ -1079,41 +1059,8 @@ div.stButton
     flex-direction:
         column !important;
 
-    justify-content:
-        center !important;
-
-    align-items:
-        center !important;
-
     gap:
         2px !important;
-
-    display:
-        flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    line-height:
-        1.2 !important;
-}
-
-
-[class*="st-key-organization-navigation"] div.stButton > button > div,
-[class*="st-key-organization-navigation"] div.stButton > button p,
-[class*="st-key-organization-navigation"] div.stButton > button span {
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    line-height:
-        1.2 !important;
 }
 
 
@@ -1143,9 +1090,6 @@ div.stButton
     white-space:
         normal !important;
 
-    line-height:
-        1.3 !important;
-
     padding:
         .4rem
         .3rem !important;
@@ -1157,38 +1101,10 @@ div.stButton
 
 [class*="st-key-assessment-selection"] div.stButton > button {
 
-    display:
-        flex !important;
-
     flex-direction:
         column !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
     gap:
         4px !important;
-
-    line-height:
-        1.2 !important;
-}
-
-
-[class*="st-key-assessment-selection"] div.stButton > button > div,
-[class*="st-key-assessment-selection"] div.stButton > button p,
-[class*="st-key-assessment-selection"] div.stButton > button span {
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    line-height:
-        1.2 !important;
 }
 
 
@@ -1222,37 +1138,6 @@ div.stButton
 
     content:
         "현재 학습상태를 확인합니다.";
-}
-
-
-[class*="st-key-assessment-selection"] div.stButton > button {
-
-    display:
-        flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    line-height:
-        1.2 !important;
-}
-
-
-[class*="st-key-assessment-selection"] div.stButton > button > div,
-[class*="st-key-assessment-selection"] div.stButton > button p,
-[class*="st-key-assessment-selection"] div.stButton > button span {
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    line-height:
-        1.2 !important;
 }
 
 
