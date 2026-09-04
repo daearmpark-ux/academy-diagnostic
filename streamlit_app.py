@@ -30,6 +30,11 @@ from ui.pages.academic import (
     render_academic_validation_message,
 )
 from ui.pages.assessment import render_assessment_page
+from ui.pages.guardian import (
+    render_guardian_checklist_page,
+    render_guardian_info_page,
+    render_guardian_result_page,
+)
 from ui.pages.organization import render_organization_page
 from ui.styles import inject_styles
 
@@ -989,17 +994,15 @@ def home_page():
             st.rerun()
         return
     if st.session_state.selected_assessment_mode == "guardian_checklist":
-        render_page_title("대상자 정보")
-        name = st.text_input("아이 이름", value=st.session_state.student_name, key="routing_name")
-        phone = st.text_input("보호자 연락처 (선택)", value=st.session_state.phone, key="routing_phone")
-        level = st.selectbox("연령", ["5세", "6세", "7세"], key="routing_age")
-        st.info("보호자가 평소 생활과 놀이에서 관찰한 모습을 바탕으로 체크하는 상담 참고자료입니다. 아동이 직접 문제를 풀거나 학업능력을 평가하는 검사가 아닙니다.")
-        confirmed = st.checkbox("이 체크리스트는 보호자가 평소 관찰한 내용을 입력하는 상담 참고자료임을 확인했습니다.", key="routing_confirm")
-        if st.button("관찰 체크 시작하기", type="primary", use_container_width=True, disabled=not confirmed):
-            if not name.strip():
+        guardian_info = render_guardian_info_page(
+            st.session_state.student_name,
+            st.session_state.phone,
+        )
+        if guardian_info["start_clicked"]:
+            if not guardian_info["name"].strip():
                 st.error("아이 이름을 입력해주세요.")
                 return
-            st.session_state.update(student_name=name.strip(), phone=phone, level=level, subject=None, question_no=1, answers={}, times={}, result_saved=False, page="guardian_test")
+            st.session_state.update(student_name=guardian_info["name"].strip(), phone=guardian_info["phone"], level=guardian_info["level"], subject=None, question_no=1, answers={}, times={}, result_saved=False, page="guardian_test")
             st.rerun()
         return
     academic_info = render_academic_info_page(
@@ -1021,20 +1024,21 @@ def guardian_test_page():
     number = st.session_state.question_no
     item = items[number - 1]
     context_navigation()
-    render_page_title("우리아이 입학준비 관찰 체크")
-    st.caption(f"체크 항목 {number} / {len(items)}")
-    render_section_title(item["domain"])
-    st.write(item["statement"])
     selected = st.session_state.answers.get(item["item_id"])
-    for value, label in checklist["response_options"].items():
-        if st.button(label, type="primary" if selected == value else "secondary", use_container_width=True, key=f"guardian_{item['item_id']}_{value}"):
-            st.session_state.answers[item["item_id"]] = value
-            st.rerun()
-    previous, next_button = st.columns(2)
-    if number > 1 and previous.button("이전", use_container_width=True):
+    action = render_guardian_checklist_page(
+        item,
+        number,
+        len(items),
+        checklist["response_options"],
+        selected,
+    )
+    if action and action["type"] == "answer":
+        st.session_state.answers[item["item_id"]] = action["value"]
+        st.rerun()
+    if action and action["type"] == "previous":
         st.session_state.question_no -= 1
         st.rerun()
-    if next_button.button("체크 완료" if number == len(items) else "다음", type="primary", use_container_width=True):
+    if action and action["type"] == "next":
         if not selected:
             st.error("관찰 응답을 선택해주세요.")
             return
@@ -1062,15 +1066,11 @@ def guardian_result_page():
             st.warning("현재 Supabase가 연결되지 않아 이 결과는 영구 저장되지 않습니다.")
     view_model = build_guardian_view_model({"student_name": st.session_state.student_name, "phone": st.session_state.phone, "level": st.session_state.level}, payload)
     context_navigation()
-    render_page_title("보호자 관찰 요약")
-    st.caption(f"{view_model['level']} · {view_model['student_name']} · {view_model['created_at'] or '현재'}")
-    labels = {"often": "자주 관찰되는 모습", "sometimes": "상황에 따라 관찰되는 모습", "not_yet_often": "상담에서 함께 살펴볼 모습", "not_observed": "추가로 관찰해볼 모습"}
-    for response, label in labels.items():
-        render_section_title(label)
-        entries = view_model["by_response"][response]
-        st.write("\n".join(f"- {item.get('statement', '')}" for item in entries) if entries else "해당 응답이 없습니다.")
-    st.info("이 결과는 보호자의 관찰 응답을 정리한 상담 참고자료이며, 아동의 학업능력·발달수준·입학 가능 여부 또는 수준별 배정을 판정하는 평가가 아닙니다.")
-    if st.button("처음으로", use_container_width=True, key="guardian_result_home"):
+    if render_guardian_result_page(
+        view_model,
+        f"{view_model['level']} · {view_model['student_name']} · {view_model['created_at'] or '현재'}",
+        "guardian_result_home",
+    ):
         reset_in_progress()
         st.session_state.page = "home"
         st.rerun()
@@ -2260,14 +2260,11 @@ def record_detail_page():
     if record.get("assessment_mode") == "guardian_checklist":
         view_model = build_guardian_view_model(record)
         context_navigation()
-        render_page_title("보호자 관찰 요약")
-        st.caption(f"소속: {record.get('organization_name', '')} · {view_model['level']} · {view_model['created_at']}")
-        labels = {"often": "자주 관찰되는 모습", "sometimes": "상황에 따라 관찰되는 모습", "not_yet_often": "상담에서 함께 살펴볼 모습", "not_observed": "추가로 관찰해볼 모습"}
-        for response, label in labels.items():
-            render_section_title(label)
-            st.write("\n".join(f"- {item.get('statement', '')}" for item in view_model["by_response"][response]) or "해당 응답이 없습니다.")
-        st.info("이 결과는 보호자의 관찰 응답을 정리한 상담 참고자료이며, 아동의 학업능력·발달수준·입학 가능 여부 또는 수준별 배정을 판정하는 평가가 아닙니다.")
-        if st.button("기록 목록으로", use_container_width=True, key="back_guardian_records"):
+        if render_guardian_result_page(
+            view_model,
+            f"소속: {record.get('organization_name', '')} · {view_model['level']} · {view_model['created_at']}",
+            "back_guardian_records",
+        ):
             st.session_state.page = "records"
             st.rerun()
         return
