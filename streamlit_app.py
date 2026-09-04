@@ -24,6 +24,11 @@ from ui.components import (
     render_page_title,
     render_section_title,
 )
+from ui.pages.academic import (
+    render_academic_info_page,
+    render_academic_question_page,
+    render_academic_validation_message,
+)
 from ui.pages.assessment import render_assessment_page
 from ui.pages.organization import render_organization_page
 from ui.styles import inject_styles
@@ -983,10 +988,10 @@ def home_page():
             st.session_state.selected_assessment_mode = selected_mode
             st.rerun()
         return
-    render_page_title("대상자 정보")
-    name = st.text_input("아이 이름", value=st.session_state.student_name, key="routing_name")
-    phone = st.text_input("보호자 연락처 (선택)", value=st.session_state.phone, key="routing_phone")
     if st.session_state.selected_assessment_mode == "guardian_checklist":
+        render_page_title("대상자 정보")
+        name = st.text_input("아이 이름", value=st.session_state.student_name, key="routing_name")
+        phone = st.text_input("보호자 연락처 (선택)", value=st.session_state.phone, key="routing_phone")
         level = st.selectbox("연령", ["5세", "6세", "7세"], key="routing_age")
         st.info("보호자가 평소 생활과 놀이에서 관찰한 모습을 바탕으로 체크하는 상담 참고자료입니다. 아동이 직접 문제를 풀거나 학업능력을 평가하는 검사가 아닙니다.")
         confirmed = st.checkbox("이 체크리스트는 보호자가 평소 관찰한 내용을 입력하는 상담 참고자료임을 확인했습니다.", key="routing_confirm")
@@ -997,13 +1002,16 @@ def home_page():
             st.session_state.update(student_name=name.strip(), phone=phone, level=level, subject=None, question_no=1, answers={}, times={}, result_saved=False, page="guardian_test")
             st.rerun()
         return
-    level = st.selectbox("학년", ["초1", "초2", "초3", "초4", "초5", "초6", "중1", "중2", "중3"], key="routing_level")
-    subject = st.selectbox("과목", subjects_for(level), key="routing_subject")
-    if st.button("학습점검 시작하기", type="primary", use_container_width=True):
-        if not name.strip():
+    academic_info = render_academic_info_page(
+        subjects_for,
+        st.session_state.student_name,
+        st.session_state.phone,
+    )
+    if academic_info["start_clicked"]:
+        if not academic_info["name"].strip():
             st.error("아이 이름을 입력해주세요.")
             return
-        st.session_state.update(student_name=name.strip(), phone=phone, level=level, subject=subject, question_no=1, answers={}, times={}, result_saved=False, page="test")
+        st.session_state.update(student_name=academic_info["name"].strip(), phone=academic_info["phone"], level=academic_info["level"], subject=academic_info["subject"], question_no=1, answers={}, times={}, result_saved=False, page="test")
         st.rerun()
 
 
@@ -1081,301 +1089,62 @@ def test_page():
     qno = st.session_state.question_no
 
     question = question_for(qno)
-
-    progress = int(
-        qno
-        /
-        total_questions
-        *
-        100
+    selected = st.session_state.answers.get(qno)
+    action = render_academic_question_page(
+        service_name(st.session_state.level),
+        st.session_state.student_name,
+        st.session_state.level,
+        st.session_state.subject,
+        question,
+        qno,
+        total_questions,
+        selected,
+        is_preschool(st.session_state.level),
     )
 
+    if action and action["type"] == "answer":
+        st.session_state.answers[qno] = action["value"]
+        st.session_state.validation_message = ""
+        st.rerun()
 
-    st.html(
-        f"""
-        <div class="exam-head">
+    if action and action["type"] == "previous":
+        capture_elapsed(qno)
+        st.session_state.question_no -= 1
+        start_timer()
+        st.session_state.validation_message = ""
+        st.rerun()
 
-            <div class="exam-kicker">
-                {service_name(st.session_state.level)}
-            </div>
+    if action and action["type"] == "pass":
+        capture_elapsed(qno)
+        st.session_state.answers[qno] = "__PASS__"
+        st.session_state.validation_message = ""
+        if qno == total_questions:
+            st.session_state.page = "result"
+        else:
+            st.session_state.question_no += 1
+            start_timer()
+        st.rerun()
 
-            <div class="exam-title">
-                {st.session_state.student_name} 학생
-            </div>
-
-            <div class="exam-meta">
-                {st.session_state.level}
-                ·
-                {st.session_state.subject}
-            </div>
-
-        </div>
-
-
-        <div class="progress-wrap">
-
-            <div class="progress-top">
-                <span>
-                    {qno} / {total_questions}
-                </span>
-
-                <span>
-                    {progress}%
-                </span>
-            </div>
-
-
-            <div class="progress-track">
-
-                <div
-                    class="progress-fill"
-                    style="width:{progress}%">
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="question-card">
-
-            <div class="question-no">
-                QUESTION {qno}
-            </div>
-
-            <div class="question-area">
-                {question["area"]}
-            </div>
-
-            <div class="question-text">
-                {question["text"]}
-            </div>
-
-            <div class="time-hint">
-                권장 풀이시간 약
-                {question["recommended_sec"]}초
-            </div>
-
-        </div>
-        """
-    )
-
-    if is_preschool(st.session_state.level):
-        st.info("문장 읽기는 보호자가 도와도 됩니다. 보기 글자는 대신 읽지 않는 것을 권장합니다.")
-
-
-    choices = question["choices"]
-
-    selected = (
-        st.session_state.answers.get(qno)
-    )
-
-
-    # 답안 버튼 영역
-    # 1 / 2
-    # 3 / 4
-    # 5 / 빈칸
-
-    outer_left, answer_area, outer_right = (
-        st.columns(
-            [1.2, 7.6, 1.2]
-        )
-    )
-
-
-    with answer_area:
-
-        row1 = st.columns(2)
-
-        row2 = st.columns(2)
-
-        row3 = st.columns(2)
-
-
-        buttons = [
-            (row1[0], 0),
-            (row1[1], 1),
-
-            (row2[0], 2),
-            (row2[1], 3),
-
-            (row3[0], 4),
-        ]
-
-
-        for column, index in buttons:
-
-            if column.button(
-                choices[index],
-                use_container_width=True,
-                type=(
-                    "primary"
-                    if selected
-                    ==
-                    choices[index]
-                    else
-                    "secondary"
-                ),
-                key=(
-                    f"answer_"
-                    f"{qno}_"
-                    f"{index}"
-                ),
-            ):
-
-                st.session_state.answers[qno] = (
-                    choices[index]
-                )
-
-                st.session_state.validation_message = (
-                    ""
-                )
-
-                st.rerun()
-
-
-    # -----------------------------------------------------
-    # Navigation
-    # -----------------------------------------------------
-
-    nav_left, nav_pass, nav_next = (
-        st.columns(
-            [1, 1.3, 2]
-        )
-    )
-
-
-    with nav_left:
-
-        if qno > 1:
-
-            if st.button(
-                "이전",
-                use_container_width=True,
-                key=f"prev_{qno}",
-            ):
-
-                capture_elapsed(qno)
-
-                st.session_state.question_no -= 1
-
-                start_timer()
-
-                st.session_state.validation_message = (
-                    ""
-                )
-
-                st.rerun()
-
-
-    with nav_pass:
-
-        if st.button(
-            "PASS",
-            use_container_width=True,
-            key=f"pass_{qno}",
-        ):
-
-            capture_elapsed(qno)
-
-            st.session_state.answers[qno] = (
-                "__PASS__"
-            )
-
+    if action and action["type"] == "next":
+        answer = st.session_state.answers.get(qno)
+        if not answer or answer == "__PASS__":
             st.session_state.validation_message = (
-                ""
+                "답안을 선택하거나, 모르는 문제는 PASS를 눌러주세요."
             )
-
-
-            if qno == total_questions:
-
-                st.session_state.page = (
-                    "result"
-                )
-
-            else:
-
-                st.session_state.question_no += 1
-
-                start_timer()
-
-
             st.rerun()
-
-
-    with nav_next:
-
-        label = (
-            "점검 완료"
-            if qno == total_questions
-            else "다음"
-        )
-
-
-        if st.button(
-            label,
-            type="primary",
-            use_container_width=True,
-            key=f"next_{qno}",
-        ):
-
-            answer = (
-                st.session_state.answers.get(qno)
-            )
-
-
-            if (
-                not answer
-                or
-                answer == "__PASS__"
-            ):
-
-                st.session_state.validation_message = (
-                    "답안을 선택하거나, "
-                    "모르는 문제는 PASS를 눌러주세요."
-                )
-
-                st.rerun()
-
-
-            capture_elapsed(qno)
-
-            st.session_state.validation_message = (
-                ""
-            )
-
-
-            if qno == total_questions:
-
-                st.session_state.page = (
-                    "result"
-                )
-
-            else:
-
-                st.session_state.question_no += 1
-
-                start_timer()
-
-
-            st.rerun()
-
-
-    st.html(
-        '<div class="pass-note">'
-        '모르는 문제는 찍지 말고 '
-        'PASS를 눌러주세요.'
-        '</div>'
-    )
+        capture_elapsed(qno)
+        st.session_state.validation_message = ""
+        if qno == total_questions:
+            st.session_state.page = "result"
+        else:
+            st.session_state.question_no += 1
+            start_timer()
+        st.rerun()
 
 
     if st.session_state.validation_message:
 
-        st.html(
-            f'<div class="validation-error">'
-            f'{st.session_state.validation_message}'
-            f'</div>'
-        )
+        render_academic_validation_message(st.session_state.validation_message)
 
 
 # =========================================================
