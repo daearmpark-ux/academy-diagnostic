@@ -371,14 +371,14 @@ def context_navigation():
     organization_name = st.session_state.selected_organization_name or "-"
     st.html(f"""
         <style>
-        [class*="st-key-nav-organization"] div.stButton > button::after {{
+        [class*="st-key-nav-organization"] div.stButton > button > div::after {{
             content: {json.dumps(f"(현재: {organization_name})", ensure_ascii=False)};
             display: block;
             font-size: 12px !important;
             font-weight: 700;
             line-height: 1.2;
         }}
-        [class*="st-key-nav-assessment"] div.stButton > button::after {{
+        [class*="st-key-nav-assessment"] div.stButton > button > div::after {{
             content: {json.dumps(f"(현재: {mode_name})", ensure_ascii=False)};
             display: block;
             font-size: 12px !important;
@@ -849,13 +849,9 @@ div[data-testid="stButton"] button,
 button[kind="primary"],
 button[kind="secondary"] {
 
-    display:
-        flex !important;
+    display: grid !important;
 
-    align-items:
-        center !important;
-
-    justify-content:
+    place-items:
         center !important;
 
     text-align:
@@ -888,10 +884,41 @@ button[kind="secondary"] {
 }
 
 
-div[data-testid="stButton"] button > div,
-div[data-testid="stButton"] button p,
-div[data-testid="stButton"] button span,
+div[data-testid="stButton"] > button > div,
+div[data-testid="stButton"] > button [data-testid="stMarkdownContainer"],
 .stButton > button > div,
+.stButton > button [data-testid="stMarkdownContainer"] {
+
+    width:
+        100% !important;
+
+    height:
+        100% !important;
+
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    text-align:
+        center !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+}
+
+div[data-testid="stButton"] > button p,
+div[data-testid="stButton"] > button span,
 .stButton > button p,
 .stButton > button span {
 
@@ -905,7 +932,7 @@ div[data-testid="stButton"] button span,
         center !important;
 
     line-height:
-        1.2 !important;
+        1.15 !important;
 }
 
 
@@ -1056,11 +1083,8 @@ div.stButton > button[kind="primary"] * {
 
 [class*="st-key-organization-navigation"] div.stButton > button {
 
-    flex-direction:
-        column !important;
-
-    gap:
-        2px !important;
+    line-height:
+        1.15 !important;
 }
 
 
@@ -1101,8 +1125,33 @@ div.stButton > button[kind="primary"] * {
 
 [class*="st-key-assessment-selection"] div.stButton > button {
 
+    line-height:
+        1.15 !important;
+}
+
+
+[class*="st-key-organization-navigation"] div.stButton > button > div,
+[class*="st-key-assessment-selection"] div.stButton > button > div {
+
+    gap:
+        4px !important;
+}
+
+
+[class*="st-key-assessment-selection"] div.stButton > button p {
+
+    display:
+        flex !important;
+
     flex-direction:
         column !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
     gap:
         4px !important;
 }
