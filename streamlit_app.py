@@ -36,6 +36,7 @@ from ui.pages.guardian import (
     render_guardian_result_page,
 )
 from ui.pages.organization import render_organization_page
+from ui.pages.results import render_result_report
 from ui.styles import inject_styles
 
 
@@ -1614,49 +1615,17 @@ def record_result_view_model(record):
     return build_saved_result_view_model(record)
 
 
-def render_result_report(view_model, mode="live"):
-    preschool = is_preschool(view_model["level"])
-    accuracy_label = "CORE 13문항 정확도" if preschool else "전체 정확도"
-    if view_model["level"] == "중2" and view_model["subject"] == "수학":
-        accuracy_label = "현재 학년 진단 정확도"
-    elif is_elementary(view_model["level"]):
-        accuracy_label = "기초영어 진단" if view_model["subject"] == "영어" else "현재 단계 진단 정확도"
-    student_title = f'{view_model["student_name"]} 학생 점검 결과'
-    subtitle = f'{view_model["level"]} · {view_model["subject"]} · {view_model["created_at"]}' if mode == "saved" else f'{view_model["student_name"]} 학생의 {"입학준비 기초 진단" if preschool else "학습점검"} 결과입니다.'
-    st.html(f'''<div class="result-hero"><div class="result-mark">✓</div><div class="result-title">{student_title if mode == "saved" else "점검이 완료되었습니다"}</div><div class="result-sub">{subtitle}</div></div>
-    <div class="metrics"><div class="metric"><div class="label">{accuracy_label}</div><div class="value">{view_model["accuracy"]}%</div></div>
-    <div class="metric"><div class="label">CORE 정답수 / 전체수</div><div class="value">{view_model["core_correct"]} / {view_model["core_total"]}</div></div>
-    <div class="metric"><div class="label">총 풀이시간</div><div class="value">{mmss(view_model["total_seconds"])}</div></div>
-    <div class="metric"><div class="label">권장시간 대비</div><div class="value">{view_model["time_difference"]}</div></div>
-    <div class="metric"><div class="label">전체 미풀이</div><div class="value">{view_model["total_pass"]}개</div></div></div>''')
-
-    if view_model["level"] == "중2" and view_model["subject"] == "수학" or preschool or is_elementary(view_model["level"]):
-        advance_title = "입학준비 기초 진단" if preschool else view_model["diagnostic_title"]
-        next_title = "다음 단계 진입 탐색" if preschool or is_elementary(view_model["level"]) else "상위 과정 진입 탐색"
-        st.html(f'''<div class="result-card"><div class="card-title">{advance_title}</div><div class="recommend"><div class="r-label">CORE {view_model["core_total"]}문항</div><div class="r-text">{view_model["core_correct"]} / {view_model["core_total"]} · {view_model["accuracy"]}%</div><div class="r-label">진단 신호</div><div class="r-text">{view_model["diagnostic_signal"]}</div></div></div>
-        <div class="result-card"><div class="card-title">{next_title}</div><div class="recommend"><div class="r-label">ADVANCE_PROBE</div><div class="r-text">{view_model["advance_correct"]} / {view_model["advance_total"]}</div><div class="t-sub">{view_model["advance_interpretation"]}</div></div></div>''')
-    else:
-        st.html(f'''<div class="result-card"><div class="card-title">{view_model["diagnostic_title"]}</div><div class="recommend"><div class="r-label">진단 신호</div><div class="r-text">{view_model["diagnostic_signal"]}</div></div></div>''')
-
-    bars = "".join(f'<div class="bar-row"><div class="bar-head"><span>{area}</span><b>{data.get("accuracy", 0)}% · 미풀이 {data.get("pass", 0)}개</b></div><div class="bar-track"><div class="bar-fill" style="width:{data.get("accuracy", 0)}%"></div></div></div>' for area, data in view_model["areas"].items())
-    time_boxes = "".join(f'<div class="time-box"><div class="t-title">{area}</div><div class="t-sub">실제 {mmss(data.get("actual", 0))} · 권장 {mmss(data.get("recommended", 0))} · {time_difference_text(data.get("actual", 0), data.get("recommended", 0))} · 미풀이 {data.get("pass", 0)}개</div></div>' for area, data in view_model["areas"].items())
-    st.html(f'<div class="result-card"><div class="card-title">영역별 학습상태</div>{bars}</div><div class="result-card"><div class="card-title">영역별 풀이시간</div><div class="time-grid">{time_boxes}</div></div>')
-    recommendation_sections = "".join(f'<div class="recommend"><div class="r-label">{group["label"]}</div><div class="r-text">{" · ".join(group["areas"])}</div><div class="t-sub">{" ".join(group["messages"])}</div></div>' for group in view_model["recommendation_groups"])
-    st.html(f'<div class="result-card"><div class="card-title">학습 추천</div>{recommendation_sections}</div>')
-    if view_model["phone"]:
-        st.info("연락처: " + view_model["phone"])
-    if view_model["legacy"]:
-        st.info("이 기록은 이전 버전에서 생성되어 일부 상세 진단 정보가 제공되지 않습니다.")
-    if mode == "saved" and st.button("기록 목록으로", use_container_width=True, key="back_records_common"):
-        st.session_state.page = "records"
-        st.rerun()
-
-
 def result_page():
     context_navigation()
     result = build_result_view_model(build_result(), st.session_state.level, st.session_state.subject, st.session_state.student_name, st.session_state.phone, current_question_set().get("test_version", ""))
     save_result_once()
-    render_result_report(result)
+    render_result_report(
+        result,
+        is_preschool=is_preschool(st.session_state.level),
+        is_elementary=is_elementary(st.session_state.level),
+        duration_formatter=mmss,
+        time_difference_formatter=time_difference_text,
+    )
     if not supabase_ready():
         st.warning("현재 Supabase가 연결되지 않아 이 결과는 영구 저장되지 않습니다.")
     if st.button("처음으로", use_container_width=True, key="result_home_common"):
@@ -2268,7 +2237,16 @@ def record_detail_page():
             st.session_state.page = "records"
             st.rerun()
         return
-    render_result_report(record_result_view_model(record), mode="saved")
+    if render_result_report(
+        record_result_view_model(record),
+        mode="saved",
+        is_preschool=is_preschool(record.get("level")),
+        is_elementary=is_elementary(record.get("level")),
+        duration_formatter=mmss,
+        time_difference_formatter=time_difference_text,
+    ) == "records":
+        st.session_state.page = "records"
+        st.rerun()
 
 
 # =========================================================
