@@ -25,6 +25,7 @@ from ui.components import (
     render_selection_card,
     render_section_title,
 )
+from ui.pages.organization import render_organization_page
 from ui.styles import inject_styles
 
 
@@ -969,29 +970,12 @@ def home_page():
     if st.session_state.get("selected_organization_code"):
         context_navigation()
     if not st.session_state.get("selected_organization_code"):
-        organizations_by_code = {organization["code"]: organization for organization in ORGANIZATIONS}
-        bureau = organizations_by_code["JUNGNANG_WOLGYE_BUREAU"]
-        center_codes = (
-            "WOLGYE_CENTER", "GONGNEUNG_CENTER",
-            "MYEONMOK_CENTER", "SINNAE_CENTER",
-            "GWAGIDAE_CENTER", "JUNGNANG_CENTER",
-        )
-        with st.container(key="organization-selection"):
-            render_page_title("소속을 선택해주세요")
-            with st.container(key="organization-bureau"):
-                if st.button(bureau["name"], key=f"org_{bureau['code']}", use_container_width=True):
-                    st.session_state.selected_organization_code = bureau["code"]
-                    st.session_state.selected_organization_name = bureau["name"]
-                    st.rerun()
-            with st.container(key="organization-grid"):
-                for row_start in range(0, len(center_codes), 2):
-                    columns = st.columns(2)
-                    for column, code in zip(columns, center_codes[row_start:row_start + 2]):
-                        organization = organizations_by_code[code]
-                        if column.button(organization["name"], key=f"org_{organization['code']}", use_container_width=True):
-                            st.session_state.selected_organization_code = organization["code"]
-                            st.session_state.selected_organization_name = organization["name"]
-                            st.rerun()
+        selection = render_organization_page(ORGANIZATIONS)
+        if selection:
+            selected_code, selected_name = selection
+            st.session_state.selected_organization_code = selected_code
+            st.session_state.selected_organization_name = selected_name
+            st.rerun()
         return
     if not st.session_state.get("selected_assessment_mode"):
         with st.container(key="assessment-selection"):
