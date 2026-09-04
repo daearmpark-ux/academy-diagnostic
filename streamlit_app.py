@@ -22,9 +22,9 @@ from question_registry import get_guardian_checklist
 from ui.components import (
     render_context_navigation,
     render_page_title,
-    render_selection_card,
     render_section_title,
 )
+from ui.pages.assessment import render_assessment_page
 from ui.pages.organization import render_organization_page
 from ui.styles import inject_styles
 
@@ -978,27 +978,10 @@ def home_page():
             st.rerun()
         return
     if not st.session_state.get("selected_assessment_mode"):
-        with st.container(key="assessment-selection"):
-            render_page_title("점검 선택")
-            left, right = st.columns(2)
-            with left:
-                if render_selection_card(
-                    "입학준비 체크리스트",
-                    "assessment-guardian",
-                    use_container_width=True,
-                    key="mode_guardian",
-                ):
-                    st.session_state.selected_assessment_mode = "guardian_checklist"
-                    st.rerun()
-            with right:
-                if render_selection_card(
-                    "초,중등 학습점검",
-                    "assessment-academic",
-                    use_container_width=True,
-                    key="mode_academic",
-                ):
-                    st.session_state.selected_assessment_mode = "academic_test"
-                    st.rerun()
+        selected_mode = render_assessment_page()
+        if selected_mode:
+            st.session_state.selected_assessment_mode = selected_mode
+            st.rerun()
         return
     render_page_title("대상자 정보")
     name = st.text_input("아이 이름", value=st.session_state.student_name, key="routing_name")
