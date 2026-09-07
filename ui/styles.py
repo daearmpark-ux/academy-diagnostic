@@ -266,7 +266,6 @@ button[kind="secondary"] {
 
     box-sizing:
         border-box !important;
-        100% !important;
 
     display:
         flex !important;
@@ -1466,109 +1465,4 @@ div.stButton > button[kind="primary"] * {
             1fr;
     }
 }
-
-
-/* FINAL BUTTON ALIGNMENT OVERRIDE */
-
-div[data-testid="stButton"] > button,
-div.stButton > button,
-button[kind="primary"],
-button[kind="secondary"] {
-
-    display:
-        flex !important;
-
-    flex-direction:
-        column !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    text-align:
-        center !important;
-
-    padding-top:
-        0 !important;
-
-    padding-bottom:
-        0 !important;
-}
-
-
-div[data-testid="stButton"] > button > div,
-div.stButton > button > div,
-div[data-testid="stButton"] > button [data-testid="stMarkdownContainer"],
-div.stButton > button [data-testid="stMarkdownContainer"] {
-
-    display:
-        flex !important;
-
-    flex-direction:
-        column !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    text-align:
-        center !important;
-
-    width:
-        100% !important;
-
-    height:
-        auto !important;
-
-    min-height:
-        0 !important;
-
-    flex:
-        0 0 auto !important;
-
-    gap:
-        4px !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-}
-
-
-div[data-testid="stButton"] > button p,
-div[data-testid="stButton"] > button span,
-div.stButton > button p,
-div.stButton > button span {
-
-    display:
-        flex !important;
-
-    flex-direction:
-        column !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    text-align:
-        center !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    line-height:
-        1.15 !important;
-}
-
 </style>""")
