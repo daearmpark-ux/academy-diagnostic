@@ -269,6 +269,7 @@ div[data-testid="stButton"] > button {
     padding: .65rem 1rem !important;
     border-radius: 12px !important;
     text-align: center !important;
+    position: relative !important;
 }
 
 div[data-testid="stButton"] > button > div,
@@ -287,6 +288,11 @@ div[data-testid="stButton"] > button p {
     padding: 0 !important;
     line-height: 1.2 !important;
     text-align: center !important;
+    position: absolute !important;
+    top: 50%;
+    left: 50%;
+    width: calc(100% - 1.2rem);
+    transform: translate(-50%, -50%);
 }
 
 div[data-testid="stButton"] > button[kind="secondary"] {
@@ -502,6 +508,9 @@ div[data-testid="stButton"] > button[kind="primary"] * {
 [class*="st-key-guardian-options"] div.stButton > button p {
     font-size: 17px !important;
     line-height: 1.45 !important;
+    position: static !important;
+    width: auto;
+    transform: none;
 }
 
 
