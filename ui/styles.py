@@ -357,6 +357,9 @@ div[data-testid="stButton"] > button[kind="primary"] * {
 [class*="st-key-organization-navigation"] div.stButton > button p {
     font-size: clamp(16px, 2.6vw, 22px) !important;
     font-weight: 800 !important;
+    position: static !important;
+    width: auto;
+    transform: none;
 }
 
 [class*="st-key-organization-navigation"] div.stButton > button > div::after {
