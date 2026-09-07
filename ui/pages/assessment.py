@@ -24,7 +24,7 @@ def render_assessment_page() -> AssessmentSelection | None:
                 return "guardian_checklist"
         with right:
             if render_selection_card(
-                "초,중등 학습점검",
+                "초·중등 학습점검",
                 "assessment-academic",
                 use_container_width=True,
                 key="mode_academic",

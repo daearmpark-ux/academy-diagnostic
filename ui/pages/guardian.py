@@ -8,26 +8,22 @@ from ui.components import render_page_title, render_section_title, render_single
 
 
 def render_guardian_info_page(student_name: str, phone: str) -> dict[str, Any]:
-    render_page_title("대상자 정보")
-    name = st.text_input(
-        "아이 이름",
-        value=student_name,
-        key="routing_name",
-    )
-    phone = st.text_input(
-        "보호자 연락처 (선택)",
-        value=phone,
-        key="routing_phone",
-    )
-    level = st.selectbox("연령", ["5세", "6세", "7세"], key="routing_age")
-    st.info("보호자가 평소 생활과 놀이에서 관찰한 모습을 바탕으로 체크하는 상담 참고자료입니다. 아동이 직접 문제를 풀거나 학업능력을 평가하는 검사가 아닙니다.")
-    confirmed = st.checkbox("이 체크리스트는 보호자가 평소 관찰한 내용을 입력하는 상담 참고자료임을 확인했습니다.", key="routing_confirm")
-    start_clicked = render_single_line_button(
-        "관찰 체크 시작하기",
-        type="primary",
-        use_container_width=True,
-        disabled=not confirmed,
-    )
+    with st.container(key="guardian-info"):
+        render_page_title("정보를 입력해주세요")
+        name = st.text_input("이름", value=student_name, key="routing_name")
+        phone = st.text_input(
+            "보호자 연락처 (선택)", value=phone, key="routing_phone"
+        )
+        level = st.selectbox("연령", ["5세", "6세", "7세"], key="routing_age")
+        st.info("보호자가 평소 생활과 놀이에서 관찰한 모습을 바탕으로 체크하는 상담 참고자료입니다. 아동이 직접 문제를 풀거나 학업능력을 평가하는 검사가 아닙니다.")
+        confirmed = st.checkbox("이 체크리스트는 보호자가 평소 관찰한 내용을 입력하는 상담 참고자료임을 확인했습니다.", key="routing_confirm")
+        start_clicked = render_single_line_button(
+            "관찰 체크 시작하기",
+            type="primary",
+            use_container_width=True,
+            disabled=not confirmed,
+            key="guardian_start",
+        )
     return {
         "name": name,
         "phone": phone,
@@ -44,18 +40,21 @@ def render_guardian_checklist_page(
     response_options: dict[str, str],
     selected_value: str | None,
 ) -> dict[str, Any] | None:
-    render_page_title("우리아이 입학준비 관찰 체크")
-    st.caption(f"체크 항목 {number} / {total_items}")
-    render_section_title(item["domain"])
-    st.write(item["statement"])
-    for value, label in response_options.items():
-        if render_single_line_button(
-            label,
-            type="primary" if selected_value == value else "secondary",
-            use_container_width=True,
-            key=f"guardian_{item['item_id']}_{value}",
-        ):
-            return {"type": "answer", "value": value}
+    with st.container(key="guardian-checklist"):
+        render_page_title("우리아이 입학준비 관찰 체크")
+        st.caption(f"체크 항목 {number} / {total_items}")
+        with st.container(key="guardian-prompt"):
+            render_section_title(item["domain"])
+            st.write(item["statement"])
+        with st.container(key="guardian-options"):
+            for value, label in response_options.items():
+                if render_single_line_button(
+                    label,
+                    type="primary" if selected_value == value else "secondary",
+                    use_container_width=True,
+                    key=f"guardian_{item['item_id']}_{value}",
+                ):
+                    return {"type": "answer", "value": value}
     previous, next_button = st.columns(2)
     with previous:
         if number > 1 and render_single_line_button(

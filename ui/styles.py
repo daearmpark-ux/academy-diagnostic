@@ -257,291 +257,246 @@ input::placeholder {
 }
 
 
-/* BUTTON */
+/* BUTTON — one authoritative alignment rule */
 
-div[data-testid="stButton"] button,
-.stButton > button,
-button[kind="primary"],
-button[kind="secondary"] {
-
-    box-sizing:
-        border-box !important;
-
-    display:
-        flex !important;
-
-    flex-direction:
-        column !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    text-align:
-        center !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
+div[data-testid="stButton"] > button {
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 48px;
+    margin: 0 !important;
+    padding: .65rem 1rem !important;
+    border-radius: 12px !important;
+    text-align: center !important;
 }
 
-div[data-testid="stButton"] > button p,
-div[data-testid="stButton"] > button span,
-.stButton > button p,
-.stButton > button span {
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    text-align:
-        center !important;
-
-    line-height:
-        1.15 !important;
+div[data-testid="stButton"] > button > div {
+    display: block !important;
+    width: 100%;
+    text-align: center !important;
 }
 
-
-div[data-testid="stButton"] button[kind="secondary"],
-div.stButton > button[kind="secondary"] {
-
-    background:
-        #FFFFFF !important;
-
-    color:
-        #17324D !important;
-
-    border:
-        1px solid
-        #CFDBE7 !important;
+div[data-testid="stButton"] > button p {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
 }
 
-
-div[data-testid="stButton"] button[kind="secondary"] *,
-div.stButton > button[kind="secondary"] * {
-
-    color:
-        #17324D !important;
-
-    -webkit-text-fill-color:
-        #17324D !important;
+div[data-testid="stButton"] > button[kind="secondary"] {
+    background: #FFFFFF !important;
+    color: #17324D !important;
+    border: 1px solid #CFDBE7 !important;
 }
 
-
-div[data-testid="stButton"] button[kind="primary"],
-div.stButton > button[kind="primary"] {
-
-    background:
-        #246FE5 !important;
-
-    color:
-        #FFFFFF !important;
-
-    border:
-        1px solid
-        #246FE5 !important;
+div[data-testid="stButton"] > button[kind="secondary"] * {
+    color: #17324D !important;
+    -webkit-text-fill-color: #17324D !important;
 }
 
-
-div[data-testid="stButton"] button[kind="primary"] *,
-div.stButton > button[kind="primary"] * {
-
-    color:
-        #FFFFFF !important;
-
-    -webkit-text-fill-color:
-        #FFFFFF !important;
+div[data-testid="stButton"] > button[kind="primary"] {
+    background: #246FE5 !important;
+    color: #FFFFFF !important;
+    border: 1px solid #246FE5 !important;
 }
 
-
-[data-testid="stVerticalBlock"] {
-
-    gap:
-        .46rem !important;
+div[data-testid="stButton"] > button[kind="primary"] * {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
 }
 
+[data-testid="stVerticalBlock"] { gap: .65rem !important; }
+[data-testid="stHorizontalBlock"] { gap: .75rem !important; }
 
-[data-testid="stHorizontalBlock"] {
-
-    gap:
-        .58rem !important;
+[class*="st-key-organization-selection"] {
+    padding-top: clamp(1rem, 5vh, 3.5rem);
 }
 
-
-[class*="st-key-organization-grid"] div.stButton > button,
-[class*="st-key-organization-grid"] div.stButton > button p,
-[class*="st-key-organization-grid"] div.stButton > button span {
-
-    min-height:
-        85px !important;
-
-    text-align:
-        center !important;
-
-    white-space:
-        nowrap !important;
-
-    padding:
-        .2rem
-        .25rem !important;
-
-    font-size:
-        28px !important;
+[class*="st-key-organization-selection"] h1,
+[class*="st-key-assessment-selection"] h1 {
+    margin: 0 0 1.5rem !important;
+    text-align: center !important;
+    font-size: clamp(28px, 4vw, 38px) !important;
 }
-
-
-[class*="st-key-organization-selection"] h1 {
-
-    text-align:
-        center !important;
-
-    margin-top:
-        1.5rem !important;
-
-    margin-bottom:
-        1.5rem !important;
-}
-
 
 [class*="st-key-organization-bureau"] div.stButton > button,
+[class*="st-key-organization-grid"] div.stButton > button {
+    min-height: 88px !important;
+    padding: .75rem !important;
+    box-shadow: 0 5px 18px rgba(34, 73, 112, .05);
+}
+
 [class*="st-key-organization-bureau"] div.stButton > button p,
-[class*="st-key-organization-bureau"] div.stButton > button span {
-
-    min-height:
-        90px !important;
-
-    text-align:
-        center !important;
-
-    white-space:
-        nowrap !important;
-
-    padding:
-        .2rem
-        .25rem !important;
-
-    font-size:
-        28px !important;
+[class*="st-key-organization-grid"] div.stButton > button p {
+    font-size: 28px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
 }
 
-
-[class*="st-key-organization-navigation"] div.stButton > button,
-[class*="st-key-organization-navigation"] div.stButton > button p,
-[class*="st-key-organization-navigation"] div.stButton > button span {
-
-    min-height:
-        68px !important;
-
-    text-align:
-        center !important;
-
-    white-space:
-        normal !important;
-
-    padding:
-        .25rem
-        .3rem !important;
-
-    font-size:
-        28px !important;
+[class*="st-key-organization-navigation"] {
+    padding-top: 1.25rem;
 }
-
 
 [class*="st-key-organization-navigation"] div.stButton > button {
-
-    line-height:
-        1.15 !important;
+    min-height: 72px !important;
+    padding: .55rem .35rem !important;
 }
 
-
-[class*="st-key-assessment-selection"] h1 {
-
-    text-align:
-        center !important;
-
-    margin-top:
-        1.5rem !important;
-
-    margin-bottom:
-        1.25rem !important;
+[class*="st-key-organization-navigation"] div.stButton > button p {
+    font-size: clamp(16px, 2.6vw, 22px) !important;
+    font-weight: 800 !important;
 }
 
-
-[class*="st-key-assessment-selection"] div.stButton > button,
-[class*="st-key-assessment-selection"] div.stButton > button p,
-[class*="st-key-assessment-selection"] div.stButton > button span {
-
-    min-height:
-        68px !important;
-
-    text-align:
-        center !important;
-
-    white-space:
-        normal !important;
-
-    padding:
-        .4rem
-        .3rem !important;
-
-    font-size:
-        24px !important;
+[class*="st-key-organization-navigation"] div.stButton > button > div::after {
+    margin-top: 3px;
 }
 
+[class*="st-key-assessment-selection"] {
+    padding-top: clamp(1.1rem, 4vh, 2.8rem);
+}
 
 [class*="st-key-assessment-selection"] div.stButton > button {
-
-    line-height:
-        1.15 !important;
+    min-height: 132px !important;
+    padding: 1rem .65rem !important;
 }
 
+[class*="st-key-assessment-selection"] div.stButton > button p {
+    font-size: clamp(21px, 3.4vw, 28px) !important;
+    font-weight: 900 !important;
+    white-space: normal !important;
+}
 
 [class*="st-key-assessment-selection"] div.stButton > button p::after {
-
-    display:
-        block;
-
-    margin-top:
-        4px;
-
-    font-size:
-        12px !important;
-
-    font-weight:
-        700;
-
-    line-height:
-        1.2 !important;
+    display: block;
+    margin-top: 7px;
+    color: #6B7D90;
+    font-size: 12px !important;
+    font-weight: 700;
+    line-height: 1.3 !important;
 }
-
 
 [class*="st-key-assessment-guardian"] div.stButton > button p::after {
-
-    content:
-        "우리아이의 모습을 체크해주세요";
+    content: "우리아이의 모습을 체크해주세요";
 }
-
 
 [class*="st-key-assessment-academic"] div.stButton > button p::after {
-
-    content:
-        "현재 학습상태를 확인합니다.";
+    content: "현재 학습상태를 확인합니다.";
 }
 
+/* INFORMATION */
 
-[class*="st-key-assessment-selection"] [data-testid="stCaptionContainer"] {
+[class*="st-key-academic-info"],
+[class*="st-key-guardian-info"] {
+    max-width: 680px;
+    margin: 0 auto;
+    padding-top: 1rem;
+}
 
-    text-align:
-        center !important;
+[class*="st-key-academic-info"] h1,
+[class*="st-key-guardian-info"] h1 {
+    margin-bottom: 1.1rem !important;
+    font-size: clamp(28px, 4vw, 36px) !important;
+}
 
-    font-size:
-        14px !important;
+[class*="st-key-academic-info"] h4 {
+    margin: .55rem 0 0 !important;
+    color: var(--navy);
+    font-size: 15px;
+}
+
+[class*="st-key-academic-info"] div.stButton > button {
+    min-height: 52px !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
+}
+
+[class*="st-key-academic-info"] [class*="st-key-academic_start"] button,
+[class*="st-key-guardian-info"] [class*="st-key-guardian_start"] button {
+    min-height: 58px !important;
+    margin-top: .7rem !important;
+    font-size: 18px !important;
+    font-weight: 900 !important;
+}
+
+[class*="st-key-academic-info"] label p,
+[class*="st-key-guardian-info"] label p {
+    color: var(--navy);
+    font-size: 15px !important;
+    font-weight: 800 !important;
+}
+
+/* QUESTION AND CHECKLIST */
+
+[class*="st-key-academic-answers"] {
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+[class*="st-key-academic-answers"] div.stButton > button {
+    min-height: 64px !important;
+    padding: .7rem 1rem !important;
+}
+
+[class*="st-key-academic-answers"] div.stButton > button p {
+    font-size: 19px !important;
+    font-weight: 800 !important;
+}
+
+[class*="st-key-academic-navigation"] {
+    margin-top: .75rem;
+}
+
+[class*="st-key-academic-navigation"] div.stButton > button {
+    min-height: 50px !important;
+    font-weight: 800 !important;
+}
+
+[class*="st-key-guardian-checklist"] {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+[class*="st-key-guardian-checklist"] h1 {
+    font-size: clamp(26px, 4vw, 34px) !important;
+}
+
+[class*="st-key-guardian-prompt"] {
+    margin: .5rem 0 .85rem;
+    padding: 1.25rem 1.35rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: #FFFFFF;
+}
+
+[class*="st-key-guardian-prompt"] h3 {
+    margin: 0 0 .45rem !important;
+    color: var(--blue);
+    font-size: 15px;
+}
+
+[class*="st-key-guardian-prompt"] p {
+    margin: 0;
+    color: var(--navy);
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1.55;
+}
+
+[class*="st-key-guardian-options"] div.stButton > button {
+    min-height: 58px !important;
+    justify-content: flex-start !important;
+    padding: .8rem 1.1rem !important;
+}
+
+[class*="st-key-guardian-options"] div.stButton > button > div,
+[class*="st-key-guardian-options"] div.stButton > button p {
+    text-align: left !important;
+}
+
+[class*="st-key-guardian-options"] div.stButton > button p {
+    font-size: 17px !important;
+    line-height: 1.45 !important;
 }
 
 
@@ -912,7 +867,7 @@ div.stButton > button[kind="primary"] * {
         var(--navy);
 
     font-size:
-        21px;
+        clamp(22px, 3vw, 27px);
 
     line-height:
         1.7;
@@ -931,7 +886,7 @@ div.stButton > button[kind="primary"] * {
         #8B9BAD;
 
     font-size:
-        10px;
+        12px;
 
     text-align:
         right;
@@ -947,7 +902,7 @@ div.stButton > button[kind="primary"] * {
         #7B8DA0;
 
     font-size:
-        11px;
+        13px;
 
     text-align:
         center;
@@ -1042,7 +997,7 @@ div.stButton > button[kind="primary"] * {
         grid;
 
     grid-template-columns:
-        repeat(4,1fr);
+        repeat(auto-fit,minmax(135px,1fr));
 
     gap:
         10px;
@@ -1334,8 +1289,8 @@ div.stButton > button[kind="primary"] * {
         14px;
 
     padding:
-        13px
-        14px;
+        17px
+        18px;
 
     margin-bottom:
         8px;
@@ -1361,7 +1316,7 @@ div.stButton > button[kind="primary"] * {
         var(--navy);
 
     font-size:
-        14px;
+        16px;
 
     font-weight:
         900;
@@ -1448,7 +1403,45 @@ div.stButton > button[kind="primary"] * {
     .question-text {
 
         font-size:
-            18px;
+            22px;
+    }
+
+    .question-card {
+        padding: 22px 18px;
+    }
+
+    [class*="st-key-organization-bureau"] div.stButton > button p,
+    [class*="st-key-organization-grid"] div.stButton > button p {
+        font-size: clamp(17px, 4.6vw, 22px) !important;
+    }
+
+    [class*="st-key-organization-bureau"] div.stButton > button,
+    [class*="st-key-organization-grid"] div.stButton > button {
+        min-height: 76px !important;
+    }
+
+    [class*="st-key-assessment-selection"] div.stButton > button {
+        min-height: 116px !important;
+    }
+
+    [class*="st-key-organization-navigation"] {
+        padding-top: .65rem;
+    }
+
+    [class*="st-key-organization-navigation"] div.stButton > button {
+        min-height: 66px !important;
+    }
+
+    [class*="st-key-organization-navigation"] div.stButton > button p {
+        font-size: 14px !important;
+    }
+
+    [class*="st-key-academic-answers"] div.stButton > button {
+        min-height: 60px !important;
+    }
+
+    [class*="st-key-guardian-prompt"] p {
+        font-size: 19px;
     }
 
 

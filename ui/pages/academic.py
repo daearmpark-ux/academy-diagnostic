@@ -8,28 +8,53 @@ from ui.components import render_page_title, render_single_line_button
 
 
 def render_academic_info_page(subjects_for_level, student_name: str, phone: str) -> dict[str, Any]:
-    render_page_title("대상자 정보")
-    name = st.text_input(
-        "아이 이름",
-        value=student_name,
-        key="routing_name",
-    )
-    phone = st.text_input(
-        "보호자 연락처 (선택)",
-        value=phone,
-        key="routing_phone",
-    )
-    level = st.selectbox(
-        "학년",
-        ["초1", "초2", "초3", "초4", "초5", "초6", "중1", "중2", "중3"],
-        key="routing_level",
-    )
-    subject = st.selectbox("과목", subjects_for_level(level), key="routing_subject")
-    start_clicked = render_single_line_button(
-        "학습점검 시작하기",
-        type="primary",
-        use_container_width=True,
-    )
+    levels = ["초1", "초2", "초3", "초4", "초5", "초6", "중1", "중2", "중3"]
+    with st.container(key="academic-info"):
+        render_page_title("정보를 입력해주세요")
+        name = st.text_input("이름", value=student_name, key="routing_name")
+        phone = st.text_input(
+            "보호자 연락처 (선택)", value=phone, key="routing_phone"
+        )
+
+        st.markdown("#### 학년")
+        level = st.session_state.get("routing_level", levels[0])
+        if level not in levels:
+            level = levels[0]
+        for start in range(0, len(levels), 3):
+            columns = st.columns(3)
+            for column, option in zip(columns, levels[start:start + 3]):
+                if column.button(
+                    option,
+                    type="primary" if level == option else "secondary",
+                    use_container_width=True,
+                    key=f"routing_level_{option}",
+                ):
+                    level = option
+                    st.session_state.routing_level = option
+
+        subjects = list(subjects_for_level(level))
+        subject = st.session_state.get("routing_subject", subjects[0])
+        if subject not in subjects:
+            subject = subjects[0]
+            st.session_state.routing_subject = subject
+        st.markdown("#### 과목")
+        subject_columns = st.columns(len(subjects))
+        for column, option in zip(subject_columns, subjects):
+            if column.button(
+                option,
+                type="primary" if subject == option else "secondary",
+                use_container_width=True,
+                key=f"routing_subject_{option}",
+            ):
+                subject = option
+                st.session_state.routing_subject = option
+
+        start_clicked = render_single_line_button(
+            "학습점검 시작하기",
+            type="primary",
+            use_container_width=True,
+            key="academic_start",
+        )
     return {
         "name": name,
         "phone": phone,
@@ -124,8 +149,7 @@ def render_academic_question_page(
         st.info("문장 읽기는 보호자가 도와도 됩니다. 보기 글자는 대신 읽지 않는 것을 권장합니다.")
 
     choices = question["choices"]
-    outer_left, answer_area, outer_right = st.columns([1.2, 7.6, 1.2])
-    with answer_area:
+    with st.container(key="academic-answers"):
         row1 = st.columns(2)
         row2 = st.columns(2)
         row3 = st.columns(2)
@@ -145,21 +169,17 @@ def render_academic_question_page(
             ):
                 return {"type": "answer", "value": choices[index]}
 
-    nav_left, nav_pass, nav_next = st.columns([1, 1.3, 2])
-    with nav_left:
+    with st.container(key="academic-navigation"):
+        nav_spacer_left, nav_previous, nav_next, nav_gap, nav_pass, nav_spacer_right = st.columns(
+            [0.5, 1.25, 1.25, 0.55, 1.25, 0.5]
+        )
+    with nav_previous:
         if question_number > 1 and render_single_line_button(
             "이전",
             use_container_width=True,
             key=f"prev_{question_number}",
         ):
             return {"type": "previous"}
-    with nav_pass:
-        if render_single_line_button(
-            "PASS",
-            use_container_width=True,
-            key=f"pass_{question_number}",
-        ):
-            return {"type": "pass"}
     with nav_next:
         label = "점검 완료" if question_number == total_questions else "다음"
         if render_single_line_button(
@@ -169,6 +189,11 @@ def render_academic_question_page(
             key=f"next_{question_number}",
         ):
             return {"type": "next"}
+    with nav_pass:
+        if render_single_line_button(
+            "PASS", use_container_width=True, key=f"pass_{question_number}"
+        ):
+            return {"type": "pass"}
 
     st.html(
         '<div class="pass-note">'
