@@ -1267,6 +1267,28 @@ div[data-testid="stButton"] > button[kind="primary"] * {
 
 /* RECORDS */
 
+[class*="st-key-records-quick-switch"] [data-testid="stHorizontalBlock"] {
+    display: grid !important;
+    grid-template-columns: 1.55fr repeat(7, minmax(0, 1fr)) !important;
+    gap: .45rem !important;
+}
+
+[class*="st-key-records-quick-switch"] [data-testid="stColumn"] {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+[class*="st-key-records-quick-switch"] div.stButton > button {
+    min-height: 44px !important;
+    padding: .4rem .25rem !important;
+}
+
+[class*="st-key-records-quick-switch"] div.stButton > button p {
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+}
+
 .records-title {
 
     color:
@@ -1399,6 +1421,18 @@ div[data-testid="stButton"] > button[kind="primary"] * {
 /* MOBILE */
 
 @media(max-width:699px) {
+
+    [class*="st-key-records-quick-switch"] [data-testid="stHorizontalBlock"] {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+
+    [class*="st-key-records-quick-switch"] div.stButton > button {
+        min-height: 42px !important;
+    }
+
+    [class*="st-key-records-quick-switch"] div.stButton > button p {
+        font-size: 12px !important;
+    }
 
     .block-container {
 
