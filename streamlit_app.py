@@ -5,6 +5,7 @@ from datetime import datetime
 
 import requests
 import streamlit as st
+import streamlit.components.v1 as components
 
 from diagnostic_engine import (
     calculate_result,
@@ -48,6 +49,27 @@ st.set_page_config(
     page_icon="📘",
     layout="centered",
     initial_sidebar_state="collapsed",
+)
+
+components.html(
+    """
+    <script>
+    const doc = window.parent.document;
+    doc.documentElement.lang = "ko";
+    doc.documentElement.setAttribute("translate", "no");
+    doc.body.setAttribute("translate", "no");
+    doc.body.classList.add("notranslate");
+
+    if (!doc.head.querySelector('meta[name="google"][content="notranslate"]')) {
+        const meta = doc.createElement("meta");
+        meta.name = "google";
+        meta.content = "notranslate";
+        doc.head.appendChild(meta);
+    }
+    </script>
+    """,
+    height=0,
+    width=0,
 )
 
 
@@ -870,6 +892,8 @@ def records_page():
         export_day,
         mmss,
         st.session_state.delete_confirm_id,
+        ORGANIZATIONS,
+        st.session_state.get("selected_organization_code", ""),
     )
     if not action:
         return
@@ -880,6 +904,13 @@ def records_page():
         st.session_state.pop("records_pin_input", None)
         st.session_state.view_record = None
         st.session_state.delete_confirm_id = None
+        st.rerun()
+    if action_type == "switch_organization":
+        st.session_state.selected_organization_code = action["organization_code"]
+        st.session_state.selected_organization_name = action["organization_name"]
+        st.session_state.delete_confirm_id = None
+        st.session_state.view_record = None
+        st.session_state.page = "records"
         st.rerun()
     if action_type == "view":
         st.session_state.view_record = action["record"]

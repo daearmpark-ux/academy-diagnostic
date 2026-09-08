@@ -7,6 +7,17 @@ import streamlit as st
 from ui.components import render_single_line_button
 
 
+RECORDS_ORGANIZATION_LABELS = (
+    ("JUNGNANG_WOLGYE_BUREAU", "교육국"),
+    ("WOLGYE_CENTER", "월계"),
+    ("GONGNEUNG_CENTER", "공릉"),
+    ("MYEONMOK_CENTER", "면목"),
+    ("SINNAE_CENTER", "신내"),
+    ("GWAGIDAE_CENTER", "과기대"),
+    ("JUNGNANG_CENTER", "중랑"),
+)
+
+
 def render_records_header(organization_name: str) -> None:
     st.html(
         '<div class="records-title">'
@@ -48,14 +59,42 @@ def render_records_list_page(
     export_date: str | None,
     duration_formatter,
     delete_confirm_id: str | None,
+    organizations: list[dict[str, Any]],
+    selected_organization_code: str,
 ) -> dict[str, Any] | None:
-    lock_col, _ = st.columns([1, 3])
-    if lock_col.button(
-        "다시 잠그기",
-        use_container_width=True,
-        key="records_pin_lock",
-    ):
-        return {"type": "lock"}
+    organizations_by_code = {
+        organization["code"]: organization
+        for organization in organizations
+    }
+
+    with st.container(key="records-quick-switch"):
+        action_columns = st.columns(
+            [1.55, 1, 1, 1, 1, 1, 1, 1],
+            gap="small",
+        )
+        if action_columns[0].button(
+            "다시 잠그기",
+            use_container_width=True,
+            key="records_pin_lock",
+        ):
+            return {"type": "lock"}
+
+        for column, (code, short_label) in zip(
+            action_columns[1:],
+            RECORDS_ORGANIZATION_LABELS,
+        ):
+            organization = organizations_by_code[code]
+            if column.button(
+                short_label,
+                type="primary" if code == selected_organization_code else "secondary",
+                use_container_width=True,
+                key=f"records_org_{code}",
+            ):
+                return {
+                    "type": "switch_organization",
+                    "organization_code": code,
+                    "organization_name": organization["name"],
+                }
 
     if supabase_available:
         st.html(
