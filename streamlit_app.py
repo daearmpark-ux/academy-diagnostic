@@ -120,6 +120,9 @@ def service_name(level):
 
 def mmss(seconds):
 
+    if seconds is None:
+        seconds = 0
+
     minutes, seconds = divmod(
         max(0, int(seconds)),
         60

@@ -130,6 +130,36 @@ def render_records_list_page(
     for record in records:
         record_id = record.get("id")
         phone = record.get("phone") or "연락처 미입력"
+
+        is_guardian = (
+            record.get("assessment_mode")
+            == "guardian_checklist"
+        )
+
+        subject_label = (
+            record.get("subject")
+            or (
+                "입학준비 체크리스트"
+                if is_guardian
+                else ""
+            )
+        )
+
+        if is_guardian:
+            score_summary = (
+                "보호자 체크리스트 · 결과 저장 완료"
+            )
+        else:
+            accuracy = record.get("accuracy") or 0
+            pass_count = record.get("pass_count") or 0
+            total_seconds = record.get("total_seconds") or 0
+
+            score_summary = (
+                f"정확도 {accuracy}% · "
+                f"미풀이 {pass_count}개 · "
+                f"총 풀이시간 {duration_formatter(total_seconds)}"
+            )
+
         st.html(
             f"""
             <div class="record-card">
@@ -144,7 +174,7 @@ def render_records_list_page(
                             ·
                             {record.get("level","")}
                             ·
-                            {record.get("subject","")}
+                            {subject_label}
 
                         </div>
 
@@ -168,18 +198,7 @@ def render_records_list_page(
 
                 <div class="record-score">
 
-                    정확도
-                    {record.get("accuracy",0)}%
-
-                    ·
-
-                    미풀이
-                    {record.get("pass_count",0)}개
-
-                    ·
-
-                    총 풀이시간
-                    {duration_formatter(record.get("total_seconds",0))}
+                    {score_summary}
 
                 </div>
 
