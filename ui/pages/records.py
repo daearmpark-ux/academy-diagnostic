@@ -61,6 +61,9 @@ def render_records_list_page(
     delete_confirm_id: str | None,
     organizations: list[dict[str, Any]],
     selected_organization_code: str,
+    page_number: int,
+    has_previous: bool,
+    has_next: bool,
 ) -> dict[str, Any] | None:
     organizations_by_code = {
         organization["code"]: organization
@@ -240,6 +243,35 @@ def render_records_list_page(
                 key=f"confirm_delete_{record_id}",
             ):
                 return {"type": "confirm_delete", "record_id": record_id}
+
+    if records or has_previous or has_next:
+        previous_col, page_col, next_col = st.columns(
+            [1, 1, 1],
+            gap="medium",
+        )
+
+        if previous_col.button(
+            "이전",
+            disabled=not has_previous,
+            use_container_width=True,
+            key="records_previous_page",
+        ):
+            return {"type": "previous_page"}
+
+        page_col.markdown(
+            f"<div style='text-align:center; padding-top:0.55rem;'>"
+            f"{page_number} 페이지"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+        if next_col.button(
+            "다음",
+            disabled=not has_next,
+            use_container_width=True,
+            key="records_next_page",
+        ):
+            return {"type": "next_page"}
 
     if render_single_line_button(
         "메인으로 돌아가기",

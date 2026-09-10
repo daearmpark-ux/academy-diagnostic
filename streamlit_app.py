@@ -244,22 +244,31 @@ def db_insert(record):
         return False, str(exc)
 
 
-def db_list():
+def db_list(page_index=0, page_size=20):
 
     if not supabase_ready():
 
-        return []
+        return [], False
 
     organization_code = st.session_state.get("selected_organization_code")
     if not organization_code:
-        return []
+        return [], False
+
+    page_index = max(0, int(page_index))
+    page_size = max(1, int(page_size))
+    offset = page_index * page_size
+
     try:
 
         url = (
             st.secrets["SUPABASE_URL"].rstrip("/")
             +
             "/rest/v1/diagnostic_records"
-                + f"?select=*&organization_code=eq.{organization_code}&order=created_at.desc"
+            +
+            f"?select=*&organization_code=eq.{organization_code}"
+            f"&order=created_at.desc"
+            f"&limit={page_size + 1}"
+            f"&offset={offset}"
         )
 
         response = requests.get(
@@ -271,11 +280,15 @@ def db_list():
         response.raise_for_status()
 
         organization_code = st.session_state.get("selected_organization_code")
-        return filter_records(response.json(), organization_code)
+        rows = filter_records(response.json(), organization_code)
+
+        has_next = len(rows) > page_size
+
+        return rows[:page_size], has_next
 
     except Exception:
 
-        return []
+        return [], False
 
 
 def db_list_all_for_export(page_size=500):
@@ -377,6 +390,7 @@ DEFAULTS = {
     "records_pin_unlocked": False,
     "records_pin_error": "",
     "records_pin_input": "",
+    "records_page_index": 0,
     "selected_organization_code": None,
     "selected_organization_name": None,
     "selected_assessment_mode": None,
@@ -880,8 +894,23 @@ def records_page():
         attempts_csv = None
         items_csv = None
         export_day = None
+        page_index = 0
+        has_next = False
     else:
-        records = db_list()
+        page_index = max(
+            0,
+            int(st.session_state.get("records_page_index", 0)),
+        )
+
+        records, has_next = db_list(
+            page_index=page_index,
+            page_size=20,
+        )
+
+        if not records and page_index > 0:
+            st.session_state.records_page_index = page_index - 1
+            st.rerun()
+
         export_records = db_list_all_for_export()
         attempts_csv, items_csv = build_export_csvs(export_records) if export_records else (None, None)
         export_day = export_date() if export_records else None
@@ -897,6 +926,9 @@ def records_page():
         st.session_state.delete_confirm_id,
         ORGANIZATIONS,
         st.session_state.get("selected_organization_code", ""),
+        page_index + 1,
+        page_index > 0,
+        has_next,
     )
     if not action:
         return
@@ -907,13 +939,30 @@ def records_page():
         st.session_state.pop("records_pin_input", None)
         st.session_state.view_record = None
         st.session_state.delete_confirm_id = None
+        st.session_state.records_page_index = 0
         st.rerun()
     if action_type == "switch_organization":
         st.session_state.selected_organization_code = action["organization_code"]
         st.session_state.selected_organization_name = action["organization_name"]
+        st.session_state.records_page_index = 0
         st.session_state.delete_confirm_id = None
         st.session_state.view_record = None
         st.session_state.page = "records"
+        st.rerun()
+
+    if action_type == "previous_page":
+        st.session_state.records_page_index = max(
+            0,
+            st.session_state.get("records_page_index", 0) - 1,
+        )
+        st.session_state.delete_confirm_id = None
+        st.rerun()
+
+    if action_type == "next_page":
+        st.session_state.records_page_index = (
+            st.session_state.get("records_page_index", 0) + 1
+        )
+        st.session_state.delete_confirm_id = None
         st.rerun()
     if action_type == "view":
         st.session_state.view_record = action["record"]
@@ -928,7 +977,15 @@ def records_page():
     if action_type == "confirm_delete":
         if db_delete(action["record_id"]):
             st.session_state.delete_confirm_id = None
+
+            if (
+                st.session_state.get("records_page_index", 0) > 0
+                and len(records) <= 1
+            ):
+                st.session_state.records_page_index -= 1
+
             st.rerun()
+
         st.error("삭제하지 못했습니다.")
     if action_type == "home":
         st.session_state.page = "home"
