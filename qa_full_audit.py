@@ -3,7 +3,12 @@
 from diagnostic_engine import calculate_result, time_difference_text
 from question_registry import QUESTION_SETS, get_question_set, get_questions
 from question_bank.middle.grade2_math import M2_MATH_ANSWER_KEY
-from organization_registry import ORGANIZATIONS, filter_records, validate_organizations
+from organization_registry import (
+    ORGANIZATIONS,
+    filter_records,
+    get_organization,
+    validate_organizations,
+)
 from question_bank.preschool.guardian_checklist import ITEMS, RESPONSE_OPTIONS, TEST_VERSION
 
 EXPECTED = {
@@ -104,7 +109,8 @@ def audit_metadata_and_regressions():
 
 def audit_guardian_and_organizations():
     assert validate_organizations()
-    assert len(ORGANIZATIONS) == 7
+    assert len(ORGANIZATIONS) == 8
+    assert get_organization("MADLE_CENTER")["name"] == "마들러닝센터"
     assert len(ITEMS) == 15
     assert [item["item_id"] for item in ITEMS] == [f"GC-{index:02d}" for index in range(1, 16)]
     assert len({item["domain"] for item in ITEMS}) == 5

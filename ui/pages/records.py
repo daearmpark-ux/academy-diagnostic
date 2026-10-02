@@ -8,13 +8,14 @@ from ui.components import render_single_line_button
 
 
 RECORDS_ORGANIZATION_LABELS = (
-    ("JUNGNANG_WOLGYE_BUREAU", "교육국"),
-    ("WOLGYE_CENTER", "월계"),
-    ("GONGNEUNG_CENTER", "공릉"),
-    ("MYEONMOK_CENTER", "면목"),
-    ("SINNAE_CENTER", "신내"),
-    ("GWAGIDAE_CENTER", "과기대"),
-    ("JUNGNANG_CENTER", "중랑"),
+    ("JUNGNANG_WOLGYE_BUREAU", "노원"),
+    ("WOLGYE_CENTER", "당연"),
+    ("GONGNEUNG_CENTER", "덕암"),
+    ("MYEONMOK_CENTER", "상수"),
+    ("SINNAE_CENTER", "수암"),
+    ("GWAGIDAE_CENTER", "신중계"),
+    ("JUNGNANG_CENTER", "상계"),
+    ("MADLE_CENTER", "마들"),
 )
 
 
@@ -72,7 +73,7 @@ def render_records_list_page(
 
     with st.container(key="records-quick-switch"):
         action_columns = st.columns(
-            [1.55, 1, 1, 1, 1, 1, 1, 1],
+            [1.55, 1, 1, 1, 1, 1, 1, 1, 1],
             gap="small",
         )
         if action_columns[0].button(
