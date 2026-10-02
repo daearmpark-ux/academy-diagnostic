@@ -1269,7 +1269,7 @@ div[data-testid="stButton"] > button[kind="primary"] * {
 
 [class*="st-key-records-quick-switch"] [data-testid="stHorizontalBlock"] {
     display: grid !important;
-    grid-template-columns: 1.55fr repeat(7, minmax(0, 1fr)) !important;
+    grid-template-columns: 1.55fr repeat(8, minmax(0, 1fr)) !important;
     gap: .45rem !important;
 }
 
