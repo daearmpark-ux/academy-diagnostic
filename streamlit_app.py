@@ -235,7 +235,12 @@ def db_insert(record):
             timeout=10,
         )
 
-        response.raise_for_status()
+        if not response.ok:
+            try:
+                detail = response.json().get("message") or response.text
+            except (TypeError, ValueError):
+                detail = response.text
+            return False, f"HTTP {response.status_code}: {detail}"
 
         return True, None
 
@@ -383,6 +388,7 @@ DEFAULTS = {
     "times": {},
     "question_started_at": None,
     "result_saved": False,
+    "result_save_error": "",
     "current_record_id": None,
     "validation_message": "",
     "delete_confirm_id": None,
@@ -413,7 +419,7 @@ def reset_exam():
 
 
 def reset_in_progress():
-    for key in ("level", "subject", "student_name", "phone", "question_no", "answers", "times", "question_started_at", "result_saved", "current_record_id", "validation_message", "guardian_confirmed"):
+    for key in ("level", "subject", "student_name", "phone", "question_no", "answers", "times", "question_started_at", "result_saved", "result_save_error", "current_record_id", "validation_message", "guardian_confirmed"):
         st.session_state[key] = DEFAULTS[key]
 
 
@@ -637,10 +643,15 @@ def save_result_once():
     if success:
 
         st.session_state.result_saved = True
+        st.session_state.result_save_error = ""
 
         st.session_state.current_record_id = (
             record_id
         )
+    else:
+        st.session_state.result_save_error = error or "알 수 없는 저장 오류"
+        st.error("점검 기록을 저장하지 못했습니다. 이 화면을 닫지 말고 관리자에게 알려주세요.")
+        st.caption(st.session_state.result_save_error)
 
 
 # =========================================================
@@ -686,7 +697,7 @@ def home_page():
             if not guardian_info["name"].strip():
                 st.error("아이 이름을 입력해주세요.")
                 return
-            st.session_state.update(student_name=guardian_info["name"].strip(), phone=guardian_info["phone"], level=guardian_info["level"], subject=None, question_no=1, answers={}, times={}, result_saved=False, page="guardian_test")
+            st.session_state.update(student_name=guardian_info["name"].strip(), phone=guardian_info["phone"], level=guardian_info["level"], subject=None, question_no=1, answers={}, times={}, result_saved=False, result_save_error="", page="guardian_test")
             st.rerun()
         return
     academic_info = render_academic_info_page(
@@ -698,7 +709,7 @@ def home_page():
         if not academic_info["name"].strip():
             st.error("아이 이름을 입력해주세요.")
             return
-        st.session_state.update(student_name=academic_info["name"].strip(), phone=academic_info["phone"], level=academic_info["level"], subject=academic_info["subject"], question_no=1, answers={}, times={}, result_saved=False, page="test")
+        st.session_state.update(student_name=academic_info["name"].strip(), phone=academic_info["phone"], level=academic_info["level"], subject=academic_info["subject"], question_no=1, answers={}, times={}, result_saved=False, result_save_error="", page="test")
         st.rerun()
 
 
@@ -741,13 +752,16 @@ def guardian_result_page():
         if not organization:
             st.error("소속을 다시 선택해주세요.")
             return
-        record = {"id": record_id, "created_at": datetime.now().isoformat(timespec="seconds"), "student_name": st.session_state.student_name, "phone": st.session_state.phone, "level": st.session_state.level, "subject": None, "organization_code": organization["code"], "organization_name": organization["name"], "assessment_mode": "guardian_checklist", "test_version": "PRESCHOOL_GUARDIAN_CHECK_2026_v1.0", "answers_json": json.dumps(payload, ensure_ascii=False), "areas_json": json.dumps(build_guardian_areas(payload), ensure_ascii=False), "accuracy": None, "correct_count": None, "pass_count": None, "total_questions": None, "total_seconds": None, "recommended_seconds": None}
+        record = {"id": record_id, "created_at": datetime.now().isoformat(timespec="seconds"), "student_name": st.session_state.student_name, "phone": st.session_state.phone, "level": st.session_state.level, "subject": None, "organization_code": organization["code"], "organization_name": organization["name"], "assessment_mode": "guardian_checklist", "answers_json": json.dumps(payload, ensure_ascii=False), "areas_json": json.dumps(build_guardian_areas(payload), ensure_ascii=False), "accuracy": None, "correct_count": None, "pass_count": None, "total_questions": None, "total_seconds": None, "recommended_seconds": None}
         success, error = db_insert(record)
         if success:
             st.session_state.result_saved = True
+            st.session_state.result_save_error = ""
             st.session_state.current_record_id = record_id
         elif error:
-            st.warning("현재 Supabase가 연결되지 않아 이 결과는 영구 저장되지 않습니다.")
+            st.session_state.result_save_error = error
+            st.error("점검 기록을 저장하지 못했습니다. 이 화면을 닫지 말고 관리자에게 알려주세요.")
+            st.caption(error)
     view_model = build_guardian_view_model({"student_name": st.session_state.student_name, "phone": st.session_state.phone, "level": st.session_state.level}, payload)
     context_navigation()
     if render_guardian_result_page(

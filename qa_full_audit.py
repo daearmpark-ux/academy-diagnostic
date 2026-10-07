@@ -10,6 +10,7 @@ from organization_registry import (
     validate_organizations,
 )
 from question_bank.preschool.guardian_checklist import ITEMS, RESPONSE_OPTIONS, TEST_VERSION
+from guardian_model import build_guardian_answers, build_guardian_view_model
 
 EXPECTED = {
     ("5세", "입학준비"), ("6세", "입학준비"), ("7세", "입학준비"),
@@ -118,6 +119,9 @@ def audit_guardian_and_organizations():
     assert all(sum(item["domain"] == domain for item in ITEMS) == 3 for domain in {item["domain"] for item in ITEMS})
     assert set(RESPONSE_OPTIONS) == {"often", "sometimes", "not_yet_often", "not_observed"}
     assert TEST_VERSION == "PRESCHOOL_GUARDIAN_CHECK_2026_v1.0"
+    guardian_payload = build_guardian_answers({})
+    assert guardian_payload["test_version"] == TEST_VERSION
+    assert build_guardian_view_model({}, guardian_payload)["test_version"] == TEST_VERSION
     assert not any("answer" in item or "recommended_seconds" in item for item in ITEMS)
     records = [
         {"organization_code": "GWAGIDAE_CENTER", "assessment_mode": "academic_test"},

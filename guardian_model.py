@@ -10,6 +10,7 @@ from question_bank.preschool.guardian_checklist import (
 def build_guardian_answers(responses):
     return {
         "assessment_mode": "guardian_checklist",
+        "test_version": TEST_VERSION,
         "observer": OBSERVER,
         "items": [
             {
@@ -53,7 +54,7 @@ def build_guardian_view_model(record, payload=None):
         "phone": record.get("phone", ""),
         "level": record.get("level", ""),
         "created_at": record.get("created_at", ""),
-        "test_version": record.get("test_version") or TEST_VERSION,
+        "test_version": record.get("test_version") or payload.get("test_version") or TEST_VERSION,
         "items": items,
         "by_response": by_response,
         "areas": build_guardian_areas(payload),
