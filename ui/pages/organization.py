@@ -22,12 +22,21 @@ def render_organization_page(organizations: Any) -> tuple[str, str] | None:
     with st.container(key="organization-selection"):
         render_page_title("소속을 선택해주세요")
         with st.container(key="organization-bureau"):
-            if render_single_line_button(
-                bureau["name"],
-                key=f"org_{bureau['code']}",
-                use_container_width=True,
-            ):
-                return bureau["code"], bureau["name"]
+            bureau_column, madle_column = st.columns(2)
+            with bureau_column:
+                if render_single_line_button(
+                    bureau["name"],
+                    key=f"org_{bureau['code']}",
+                    use_container_width=True,
+                ):
+                    return bureau["code"], bureau["name"]
+            with madle_column:
+                if render_single_line_button(
+                    madle["name"],
+                    key=f"org_{madle['code']}",
+                    use_container_width=True,
+                ):
+                    return madle["code"], madle["name"]
         with st.container(key="organization-grid"):
             for row_start in range(0, len(center_codes), 2):
                 columns = st.columns(2)
@@ -39,11 +48,4 @@ def render_organization_page(organizations: Any) -> tuple[str, str] | None:
                         use_container_width=True,
                     ):
                         return organization["code"], organization["name"]
-        with st.container(key="organization-madle"):
-            if render_single_line_button(
-                madle["name"],
-                key=f"org_{madle['code']}",
-                use_container_width=True,
-            ):
-                return madle["code"], madle["name"]
     return None
