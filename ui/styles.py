@@ -332,14 +332,16 @@ div[data-testid="stButton"] > button[kind="primary"] * {
 }
 
 [class*="st-key-organization-bureau"] div.stButton > button,
-[class*="st-key-organization-grid"] div.stButton > button {
+[class*="st-key-organization-grid"] div.stButton > button,
+[class*="st-key-organization-hagye"] div.stButton > button {
     min-height: 88px !important;
     padding: .75rem !important;
     box-shadow: 0 5px 18px rgba(34, 73, 112, .05);
 }
 
 [class*="st-key-organization-bureau"] div.stButton > button p,
-[class*="st-key-organization-grid"] div.stButton > button p {
+[class*="st-key-organization-grid"] div.stButton > button p,
+[class*="st-key-organization-hagye"] div.stButton > button p {
     font-size: 28px !important;
     font-weight: 800 !important;
     white-space: nowrap !important;
@@ -1269,7 +1271,7 @@ div[data-testid="stButton"] > button[kind="primary"] * {
 
 [class*="st-key-records-quick-switch"] [data-testid="stHorizontalBlock"] {
     display: grid !important;
-    grid-template-columns: 1.55fr repeat(8, minmax(0, 1fr)) !important;
+    grid-template-columns: 1.55fr repeat(9, minmax(0, 1fr)) !important;
     gap: .45rem !important;
 }
 
@@ -1462,12 +1464,14 @@ div[data-testid="stButton"] > button[kind="primary"] * {
     }
 
     [class*="st-key-organization-bureau"] div.stButton > button p,
-    [class*="st-key-organization-grid"] div.stButton > button p {
+    [class*="st-key-organization-grid"] div.stButton > button p,
+    [class*="st-key-organization-hagye"] div.stButton > button p {
         font-size: clamp(17px, 4.6vw, 22px) !important;
     }
 
     [class*="st-key-organization-bureau"] div.stButton > button,
-    [class*="st-key-organization-grid"] div.stButton > button {
+    [class*="st-key-organization-grid"] div.stButton > button,
+    [class*="st-key-organization-hagye"] div.stButton > button {
         min-height: 76px !important;
     }
 

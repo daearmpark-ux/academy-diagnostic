@@ -19,6 +19,7 @@ def render_organization_page(organizations: Any) -> tuple[str, str] | None:
         "GWAGIDAE_CENTER", "JUNGNANG_CENTER",
     )
     madle = organizations_by_code["MADLE_CENTER"]
+    hagye = organizations_by_code["HAGYE_CENTER"]
     with st.container(key="organization-selection"):
         render_page_title("소속을 선택해주세요")
         with st.container(key="organization-bureau"):
@@ -48,4 +49,11 @@ def render_organization_page(organizations: Any) -> tuple[str, str] | None:
                         use_container_width=True,
                     ):
                         return organization["code"], organization["name"]
+        with st.container(key="organization-hagye"):
+            if render_single_line_button(
+                hagye["name"],
+                key=f"org_{hagye['code']}",
+                use_container_width=True,
+            ):
+                return hagye["code"], hagye["name"]
     return None

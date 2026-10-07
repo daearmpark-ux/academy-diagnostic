@@ -109,8 +109,9 @@ def audit_metadata_and_regressions():
 
 def audit_guardian_and_organizations():
     assert validate_organizations()
-    assert len(ORGANIZATIONS) == 8
+    assert len(ORGANIZATIONS) == 9
     assert get_organization("MADLE_CENTER")["name"] == "마들러닝센터"
+    assert get_organization("HAGYE_CENTER")["name"] == "하계러닝센터"
     assert len(ITEMS) == 15
     assert [item["item_id"] for item in ITEMS] == [f"GC-{index:02d}" for index in range(1, 16)]
     assert len({item["domain"] for item in ITEMS}) == 5
