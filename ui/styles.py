@@ -1514,3 +1514,18 @@ div[data-testid="stButton"] > button[kind="primary"] * {
     }
 }
 </style>""")
+
+
+    st.html("""
+<style>
+/* Keep the academic question and answer controls in stable positions. */
+[class*="st-key-academic-answers"] { min-height: 216px; }
+[class*="st-key-academic-answers"] div.stButton > button { height: 64px !important; min-height: 64px !important; }
+.question-card { min-height: 250px; box-sizing: border-box; }
+@media(max-width:699px) {
+    .question-card { min-height: 230px; }
+    [class*="st-key-academic-answers"] { min-height: 204px; }
+    [class*="st-key-academic-answers"] div.stButton > button { height: 60px !important; min-height: 60px !important; }
+}
+</style>
+""")
